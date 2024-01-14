@@ -18,7 +18,7 @@ limitations under the License.
 #include <algorithm>
 
 #include "fixedpoint/fixedpoint.h"
-#include "ruy/profiler/instrumentation.h"  // from @ruy
+// #include "ruy/profiler/instrumentation.h"  // from @ruy
 #include "tensorflow/lite/kernels/internal/common.h"
 
 namespace tflite {
@@ -53,7 +53,7 @@ inline void Mul(const ArithmeticParams& params,
                 const RuntimeShape& output_shape, T* output_data) {
   TFLITE_DCHECK_LE(params.quantized_activation_min,
                    params.quantized_activation_max);
-  ruy::profiler::ScopeLabel label("Mul/8bit");
+  // ruy::profiler::ScopeLabel label("Mul/8bit");
   const int flat_size =
       MatchingElementsSize(input1_shape, input2_shape, output_shape);
 
@@ -65,7 +65,7 @@ inline void Mul(const ArithmeticParams& params,
                 const RuntimeShape& input1_shape, const int16_t* input1_data,
                 const RuntimeShape& input2_shape, const int16_t* input2_data,
                 const RuntimeShape& output_shape, int8_t* output_data) {
-  ruy::profiler::ScopeLabel label("Mul/Int16Int8");
+  // ruy::profiler::ScopeLabel label("Mul/Int16Int8");
   int32_t output_offset = params.output_offset;
   int32_t output_activation_min = params.quantized_activation_min;
   int32_t output_activation_max = params.quantized_activation_max;
@@ -95,7 +95,7 @@ inline void BroadcastMul6DSlow(
     const ArithmeticParams& params, const RuntimeShape& input1_shape,
     const T* input1_data, const RuntimeShape& input2_shape,
     const T* input2_data, const RuntimeShape& output_shape, T* output_data) {
-  ruy::profiler::ScopeLabel label("BroadcastMul6DSlow");
+  // ruy::profiler::ScopeLabel label("BroadcastMul6DSlow");
 
   NdArrayDesc<kMaxMulBroadcastDim> desc1;
   NdArrayDesc<kMaxMulBroadcastDim> desc2;

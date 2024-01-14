@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <algorithm>
 
-#include "ruy/profiler/instrumentation.h"  // from @ruy
+// #include "ruy/profiler/instrumentation.h"  // from @ruy
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 
@@ -29,7 +29,7 @@ inline void Requantize(const input_type* input_data, int32_t size,
                        int32_t effective_scale_multiplier,
                        int32_t effective_scale_shift, int32_t input_zeropoint,
                        int32_t output_zeropoint, output_type* output_data) {
-  ruy::profiler::ScopeLabel label("Requantize");
+  // ruy::profiler::ScopeLabel label("Requantize");
   const bool same_scale =
       (effective_scale_multiplier == 1 << 30 && effective_scale_shift == 1);
   if (same_scale) {

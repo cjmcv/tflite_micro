@@ -21,7 +21,7 @@ limitations under the License.
 #include <cstddef>
 #include <limits>
 
-#include "ruy/profiler/instrumentation.h"  // from @ruy
+// #include "ruy/profiler/instrumentation.h"  // from @ruy
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/kernels/internal/types.h"
@@ -257,7 +257,7 @@ void BroadcastSubSlow(const ArithmeticParams& params,
                       const RuntimeShape& input1_shape, const T* input1_data,
                       const RuntimeShape& input2_shape, const T* input2_data,
                       const RuntimeShape& output_shape, T* output_data) {
-  ruy::profiler::ScopeLabel label("BroadcastSubSlow/T");
+  // ruy::profiler::ScopeLabel label("BroadcastSubSlow/T");
   BroadcastSubCommon<T>(
       params, input1_shape, input1_data, input2_shape, input2_data,
       output_shape, output_data,
@@ -276,7 +276,7 @@ inline void BroadcastSub16POTSlow(const ArithmeticParams& params,
                                   const int16_t* input2_data,
                                   const RuntimeShape& output_shape,
                                   int16_t* output_data) {
-  ruy::profiler::ScopeLabel label("BroadcastSub16POTSlow/int16_t");
+  // ruy::profiler::ScopeLabel label("BroadcastSub16POTSlow/int16_t");
   BroadcastSubCommon<int16_t>(
       params, input1_shape, input1_data, input2_shape, input2_data,
       output_shape, output_data,
@@ -301,7 +301,7 @@ void BroadcastQuantSubSlow(const ArithmeticParams& params,
                            const RuntimeShape& input2_shape,
                            const T* input2_data,
                            const RuntimeShape& output_shape, T* output_data) {
-  ruy::profiler::ScopeLabel label("BroadcastQuantSubSlow/T");
+  // ruy::profiler::ScopeLabel label("BroadcastQuantSubSlow/T");
   BroadcastSubCommon<T>(
       params, input1_shape, input1_data, input2_shape, input2_data,
       output_shape, output_data,
@@ -447,7 +447,7 @@ inline void SubWithActivation(
     const ArithmeticParams& params, const RuntimeShape& input1_shape,
     const T* input1_data, const RuntimeShape& input2_shape,
     const T* input2_data, const RuntimeShape& output_shape, T* output_data) {
-  ruy::profiler::ScopeLabel label("SubWithActivation");
+  // ruy::profiler::ScopeLabel label("SubWithActivation");
   const int flat_size =
       MatchingElementsSize(input1_shape, input2_shape, output_shape);
   T activation_min, activation_max;

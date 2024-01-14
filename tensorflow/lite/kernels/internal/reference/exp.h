@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <cmath>
 
-#include "ruy/profiler/instrumentation.h"  // from @ruy
+// #include "ruy/profiler/instrumentation.h"  // from @ruy
 #include "tensorflow/lite/kernels/internal/types.h"
 
 namespace tflite {
@@ -26,7 +26,7 @@ namespace reference_ops {
 template <typename T>
 inline void Exp(const T* input_data, const size_t num_elements,
                 T* output_data) {
-  ruy::profiler::ScopeLabel label("Exp");
+  // ruy::profiler::ScopeLabel label("Exp");
   for (size_t idx = 0; idx < num_elements; ++idx) {
     output_data[idx] = std::exp(input_data[idx]);
   }

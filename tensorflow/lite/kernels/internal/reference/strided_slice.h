@@ -15,7 +15,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_STRIDED_SLICE_H_
 #define TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_STRIDED_SLICE_H_
 
-#include "ruy/profiler/instrumentation.h"  // from @ruy
+// #include "ruy/profiler/instrumentation.h"  // from @ruy
 #include "tensorflow/lite/kernels/internal/common.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/kernels/internal/portable_tensor.h"
@@ -31,7 +31,7 @@ inline void StridedSlice(const tflite::StridedSliceParams& op_params,
                          const RuntimeShape& unextended_input_shape,
                          const RuntimeShape& unextended_output_shape,
                          SequentialTensorWriter<T>* writer) {
-  ruy::profiler::ScopeLabel label("StridedSlice");
+  // ruy::profiler::ScopeLabel label("StridedSlice");
 
   // Note that the output_shape is not used herein.
   tflite::StridedSliceParams params_copy = op_params;

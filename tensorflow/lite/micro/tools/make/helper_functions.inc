@@ -1,4 +1,4 @@
-DOWNLOAD_SCRIPT := $(MAKEFILE_DIR)/download_and_extract.sh
+# DOWNLOAD_SCRIPT := $(MAKEFILE_DIR)/download_and_extract.sh
 
 #Handles the details of calculating the size of a binary target.
 #
@@ -6,10 +6,10 @@ DOWNLOAD_SCRIPT := $(MAKEFILE_DIR)/download_and_extract.sh
 # 1 - Name of target.
 # 2 - Regular expression for symbols to remove from the size calculation.
 #Calling eval on the output will create the targets that you need.
-define microlite_size
-size_$(1): $$($(1)_BINARY)
-	$$(SIZE_SCRIPT) $$($(1)_BINARY) $2
-endef
+# define microlite_size
+# size_$(1): $$($(1)_BINARY)
+# 	$$(SIZE_SCRIPT) $$($(1)_BINARY) $2
+# endef
 
 # Handles the details of generating a binary target, including specializing
 # for the current platform, and generating project file targets.
@@ -60,60 +60,9 @@ $(1)_bin: $$($(1)_BINARY).bin
 
 MICROLITE_BUILD_TARGETS += $$($(1)_BINARY)
 
-ifneq (,$(findstring _test,$(1)))
-ifneq (,$(findstring integration_tests,$(1)))
-  MICROLITE_INTEGRATION_TEST_TARGETS += test_$(1)
-else ifneq (,$(findstring generated_micro_mutable_op_resolver,$(1)))
-  MICROLITE_GEN_OP_RESOLVER_TEST_TARGETS += test_$(1)
-else
-  MICROLITE_TEST_TARGETS += test_$(1)
-endif
+MICROLITE_TEST_TARGETS += test_$(1)
 
-# For bluepill, the CI build is failing due to introduction of the
-# introduction of test_run_latency.sh script. Looks at
-# https://b.corp.google.com/issues/268565399#comment11 for more details.
-ifneq ($(TARGET), bluepill)
-test_$(1):$$($(1)_BINARY)
-	$(MAKEFILE_DIR)/test_latency_log.sh $(1) $$(TEST_SCRIPT) $$($(1)_BINARY) $$(TEST_PASS_STRING) $$(TARGET)
-else
 test_$(1):$$($(1)_BINARY)
 	$$(TEST_SCRIPT) $$($(1)_BINARY) $$(TEST_PASS_STRING) $$(TARGET)
-endif
-
-else
-run_$(1): $$($(1)_BINARY)
-	$$(TEST_SCRIPT) $$($(1)_BINARY) non_test_binary $$(TARGET)
-endif
 
 endef
-
-# Adds a dependency for a third-party library that needs to be downloaded from
-# an external source.
-# Arguments are:
-# 1 - URL to download archive file from (can be .zip, .tgz, or .bz).
-# 2 - MD5 sum of archive, to check integrity. Use md5sum tool to generate.
-# 3 - Folder name to unpack library into, inside tf/l/x/m/t/downloads root.
-# 4 - Optional patching action, must match clause in download_and_extract.sh.
-# 5 - Optional patching action parameter
-# These arguments are packed into a single '!' separated string, so no element
-# can contain a '!'.
-define add_third_party_download
-THIRD_PARTY_DOWNLOADS += $(1)!$(2)!$(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/make/downloads/$(3)!$(4)!$(5)
-endef
-
-# Unpacks an entry in a list of strings created by add_third_party_download, and
-# defines a dependency rule to download the library. The download_and_extract.sh
-# script is used to handle to downloading and unpacking.
-# 1 - Information about the library, separated by '!'s.
-define create_download_rule
-$(word 3, $(subst !, ,$(1))):
-	$(DOWNLOAD_SCRIPT) $(subst !, ,$(1))
-THIRD_PARTY_TARGETS += $(word 3, $(subst !, ,$(1)))
-endef
-
-# Recursively find all files of given pattern
-# Arguments are:
-# 1 - Starting path
-# 2 - File pattern, e.g: *.h
-recursive_find = $(wildcard $(1)$(2)) $(foreach dir,$(wildcard $(1)*),$(call recursive_find,$(dir)/,$(2)))
-

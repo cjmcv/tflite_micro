@@ -47,11 +47,36 @@ python -m venv tflite_micro/venv
 echo "export PYTHONPATH=\${PYTHONPATH}:${PWD}" >> tflite_micro/venv/bin/activate
 cd tflite_micro
 source venv/bin/activate
+# 需要安装一下tensorflow， pip3 install -i https://pypi.douban.com/simple/tensorflow
+# 然后开始缺啥就用pip3装啥
+# 后续使用时，需cd tflite_micro，执行 source venv/bin/activate，退出 deactivate
 pip install --upgrade pip
 pip install -r third_party/python_requirements.txt
 
 # (Optional)
 pip install ipython
+```
+
+# 自己记录的
+
+python环境安装
+
+```sh
+# 重命名
+mv tflite-micro tflite_micro
+# To set up a specific Python version, make sure `python` is pointed to the
+# desired version. For example, call `python3.11 -m venv tflite_micro/venv`.
+python -m venv tflite_micro/venv
+echo "export PYTHONPATH=\${PYTHONPATH}:${PWD}" >> tflite_micro/venv/bin/activate
+cd tflite_micro
+source venv/bin/activate
+# 需要安装一下tensorflow， 
+pip3 install -i https://pypi.douban.com/simple/tensorflow
+# 然后开始缺啥就用pip3装啥
+# 后续使用时，需cd tflite_micro，然后执行
+source venv/bin/activate
+# 退出 
+deactivate
 ```
 
 Run some tests and binaries:
