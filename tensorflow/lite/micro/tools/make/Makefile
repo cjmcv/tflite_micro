@@ -490,6 +490,13 @@ all: $(MICROLITE_LIB_PATH)
 INCLUDES += -I$(GENERATED_SRCS_DIR)
 INCLUDES += -I$(GENERATED_SRCS_DIR)$(TENSORFLOW_ROOT)
 
+ifneq ($(IS_BUILD_TEST), 1)
+  EXCLUDED_MICROLITE_CC_SRCS := \
+  	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc
+  MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
+endif
+
 MICROLITE_LIB_OBJS := $(addprefix $(CORE_OBJDIR), \
 $(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_SRCS)))))
 
