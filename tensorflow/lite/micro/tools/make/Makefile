@@ -22,11 +22,11 @@ endif
 # 构建动态库
 IS_BUILD_DYNAMIC := 0
 # 是否编译测试代码
-IS_BUILD_TEST := 1
+IS_BUILD_TEST := 0
 # 是否编译signal模块
-IS_BUILD_SIGNAL := 1
+IS_BUILD_SIGNAL := 0
 # kiss fft
-IS_BUILD_KISS_FFT := 1
+IS_BUILD_KISS_FFT := 0
 
 # root directory of tensorflow
 TENSORFLOW_ROOT :=
@@ -492,6 +492,9 @@ INCLUDES += -I$(GENERATED_SRCS_DIR)$(TENSORFLOW_ROOT)
 
 ifneq ($(IS_BUILD_TEST), 1)
   EXCLUDED_MICROLITE_CC_SRCS := \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/fake_micro_context.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernel_runner.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/mock_micro_graph.cc \
   	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc \
     $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc
   MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
