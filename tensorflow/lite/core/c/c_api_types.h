@@ -25,7 +25,7 @@ limitations under the License.
 // NOLINTBEGIN(whitespace/line_length)
 /// \note Users of TensorFlow Lite should use
 /// \code
-/// #include "tensorflow/lite/c/c_api_types.h"
+/// #include "tensorflow/lite/core/c/c_api_types.h"
 /// \endcode
 /// to access the APIs documented on this page.
 // NOLINTEND(whitespace/line_length)

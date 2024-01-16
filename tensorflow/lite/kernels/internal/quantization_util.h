@@ -36,12 +36,12 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
   const double qmax_double = qmax;
   // 0 should always be a representable value. Let's assume that the initial
   // min,max range contains 0.
-  TFLITE_CHECK_LE(rmin, 0.);
-  TFLITE_CHECK_GE(rmax, 0.);
+  TFLITE_DCHECK_LE(rmin, 0.);
+  TFLITE_DCHECK_GE(rmax, 0.);
   if (rmin == rmax) {
     // Special case where the min,max range is a point. Should be {0}.
-    TFLITE_CHECK_EQ(rmin, 0.);
-    TFLITE_CHECK_EQ(rmax, 0.);
+    TFLITE_DCHECK_EQ(rmin, 0.);
+    TFLITE_DCHECK_EQ(rmax, 0.);
     QuantizationParams quantization_params;
     quantization_params.zero_point = 0;
     quantization_params.scale = 0.;
@@ -88,8 +88,8 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
   }
   // The zero point should always be in the range of quantized value,
   // [qmin, qmax].
-  TFLITE_CHECK_GE(nudged_zero_point, qmin);
-  TFLITE_CHECK_LE(nudged_zero_point, qmax);
+  TFLITE_DCHECK_GE(nudged_zero_point, qmin);
+  TFLITE_DCHECK_LE(nudged_zero_point, qmax);
 
   // Finally, store the result nudged quantization params.
   QuantizationParams quantization_params;

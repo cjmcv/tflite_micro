@@ -23,7 +23,7 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/micro_profiler.h"
 #include "tensorflow/lite/micro/recording_micro_interpreter.h"
-#include "tensorflow/lite/micro/system_setup.h"
+// #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace {
@@ -54,7 +54,7 @@ TfLiteStatus ProfileMemoryAndLatency() {
       &profiler);
 
   TF_LITE_ENSURE_STATUS(interpreter.AllocateTensors());
-  TFLITE_CHECK_EQ(interpreter.inputs_size(), 1);
+  TFLITE_DCHECK_EQ(interpreter.inputs_size(), 1);
   interpreter.input(0)->data.f[0] = 1.f;
   TF_LITE_ENSURE_STATUS(interpreter.Invoke());
 
@@ -69,7 +69,7 @@ TfLiteStatus ProfileMemoryAndLatency() {
 TfLiteStatus LoadFloatModelAndPerformInference() {
   const tflite::Model* model =
       ::tflite::GetModel(g_hello_world_float_model_data);
-  TFLITE_CHECK_EQ(model->version(), TFLITE_SCHEMA_VERSION);
+  TFLITE_DCHECK_EQ(model->version(), TFLITE_SCHEMA_VERSION);
 
   HelloWorldOpResolver op_resolver;
   TF_LITE_ENSURE_STATUS(RegisterOps(op_resolver));
@@ -93,7 +93,7 @@ TfLiteStatus LoadFloatModelAndPerformInference() {
     interpreter.input(0)->data.f[0] = golden_inputs[i];
     TF_LITE_ENSURE_STATUS(interpreter.Invoke());
     float y_pred = interpreter.output(0)->data.f[0];
-    TFLITE_CHECK_LE(abs(sin(golden_inputs[i]) - y_pred), epsilon);
+    TFLITE_DCHECK_LE(abs(sin(golden_inputs[i]) - y_pred), epsilon);
   }
 
   return kTfLiteOk;
@@ -104,7 +104,7 @@ TfLiteStatus LoadQuantModelAndPerformInference() {
   // copying or parsing, it's a very lightweight operation.
   const tflite::Model* model =
       ::tflite::GetModel(g_hello_world_int8_model_data);
-  TFLITE_CHECK_EQ(model->version(), TFLITE_SCHEMA_VERSION);
+  TFLITE_DCHECK_EQ(model->version(), TFLITE_SCHEMA_VERSION);
 
   HelloWorldOpResolver op_resolver;
   TF_LITE_ENSURE_STATUS(RegisterOps(op_resolver));
@@ -120,10 +120,10 @@ TfLiteStatus LoadQuantModelAndPerformInference() {
   TF_LITE_ENSURE_STATUS(interpreter.AllocateTensors());
 
   TfLiteTensor* input = interpreter.input(0);
-  TFLITE_CHECK_NE(input, nullptr);
+  TFLITE_DCHECK_NE(input, nullptr);
 
   TfLiteTensor* output = interpreter.output(0);
-  TFLITE_CHECK_NE(output, nullptr);
+  TFLITE_DCHECK_NE(output, nullptr);
 
   float output_scale = output->params.scale;
   int output_zero_point = output->params.zero_point;
@@ -143,14 +143,13 @@ TfLiteStatus LoadQuantModelAndPerformInference() {
     input->data.int8[0] = golden_inputs_int8[i];
     TF_LITE_ENSURE_STATUS(interpreter.Invoke());
     float y_pred = (output->data.int8[0] - output_zero_point) * output_scale;
-    TFLITE_CHECK_LE(abs(sin(golden_inputs_float[i]) - y_pred), epsilon);
+    TFLITE_DCHECK_LE(abs(sin(golden_inputs_float[i]) - y_pred), epsilon);
   }
 
   return kTfLiteOk;
 }
 
 int main(int argc, char* argv[]) {
-  tflite::InitializeTarget();
   TF_LITE_ENSURE_STATUS(ProfileMemoryAndLatency());
   TF_LITE_ENSURE_STATUS(LoadFloatModelAndPerformInference());
   TF_LITE_ENSURE_STATUS(LoadQuantModelAndPerformInference());

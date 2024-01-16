@@ -19,7 +19,6 @@ limitations under the License.
 #include "tensorflow/lite/micro/examples/memory_footprint/models/simple_add_model_model_data.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/micro_profiler.h"
-#include "tensorflow/lite/micro/system_setup.h"
 
 // Use MicroBenchmarkRunner to avoid boiler plate code and more easily compare
 // the size with other benchmarks such as keyword_benchmark.
@@ -36,7 +35,6 @@ int main(int argc, char** argv) {
   alignas(16) uint8_t tensor_arena[kTensorArenaSize];
   uint8_t runner_buffer[sizeof(InterpreterMemoryFootprintRunner)];
 
-  tflite::InitializeTarget();
   tflite::MicroProfiler profiler;
 
   InterpreterMemoryFootprintOpResolver op_resolver;

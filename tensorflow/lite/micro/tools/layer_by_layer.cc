@@ -28,8 +28,8 @@ limitations under the License.
 
 #include "flatbuffers/flatbuffer_builder.h"
 #include "flatbuffers/util.h"
-#include "tensorflow/lite/c/c_api_types.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/c_api_types.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
 #include "tensorflow/lite/micro/micro_allocator.h"
@@ -259,7 +259,7 @@ TfLiteStatus Invoke(const Model* model, ModelTestDataT& output_data) {
       MicroResourceVariables::Create(allocator, kNumResourceVariable), nullptr);
   TF_LITE_ENSURE_STATUS(interpreter.AllocateTensors());
 
-  TF_LITE_ASSERT(interpreter.preserve_all_tensors());
+  TFLITE_DCHECK(interpreter.preserve_all_tensors());
 
   MicroPrintf("");  // null MicroPrintf serves as a newline.
 

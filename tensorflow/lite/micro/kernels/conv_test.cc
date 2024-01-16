@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/kernels/conv_test.h"
 
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/builtin_op_data.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/kernels/kernel_runner.h"
 #include "tensorflow/lite/micro/kernels/testdata/conv_test_data.h"
 #include "tensorflow/lite/micro/micro_utils.h"

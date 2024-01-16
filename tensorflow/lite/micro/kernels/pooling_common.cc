@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/lite/c/builtin_op_data.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/kernels/internal/reference/integer_ops/pooling.h"
 #include "tensorflow/lite/kernels/internal/reference/pooling.h"
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"

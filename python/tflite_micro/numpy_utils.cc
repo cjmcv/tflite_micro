@@ -23,7 +23,7 @@ limitations under the License.
 #define PY_ARRAY_UNIQUE_SYMBOL tflite_micro_python_interpreter_array_api
 #include <numpy/arrayobject.h>
 
-#include "tensorflow/lite/c/c_api_types.h"
+#include "tensorflow/lite/core/c/c_api_types.h"
 
 namespace tflite {
 

@@ -22,10 +22,11 @@ limitations under the License.
 #include <string>
 #endif  // TF_LITE_STATIC_MEMORY
 
-#include "tensorflow/lite/core/c/builtin_op_data.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/core/c/common.h"
 #ifndef NDEBUG
 #include "tensorflow/lite/kernels/op_macros.h"
+#include "tensorflow/lite/kernels/internal/compatibility.h"
 #endif
 
 namespace tflite {
@@ -180,7 +181,7 @@ inline int64_t NumElements(const int* dims, int num_dims) {
     // casts to `int32_t` without any checks. It is more meaningful to check
     // that the result fits into 32 bits than for standard overflow on 64 bit
     // type.
-    TF_LITE_ASSERT(dims[i] < std::numeric_limits<int>::max() / count);
+    TFLITE_DCHECK(dims[i] < std::numeric_limits<int>::max() / count);
 #endif
     count *= dims[i];
   }
@@ -332,9 +333,6 @@ int TfLiteTypeGetSize(TfLiteType type);
 
 // Whether the current platform is mobile (Android or iOS).
 bool IsMobilePlatform();
-
-// Returns whether there is unspecified dimension in the tensor's dim signature.
-bool HasUnspecifiedDimension(const TfLiteTensor* tensor);
 
 }  // namespace tflite
 

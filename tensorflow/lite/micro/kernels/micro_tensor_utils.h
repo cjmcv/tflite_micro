@@ -26,8 +26,8 @@ limitations under the License.
 #include <cmath>
 #include <cstdint>
 
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/builtin_op_data.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/portable_tensor_utils.h"
 
 #if defined(_MSC_VER)

@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "tensorflow/lite/c/builtin_op_data.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/builtin_op_data.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/quantization_util.h"
 #include "tensorflow/lite/kernels/internal/reference/process_broadcast_shapes.h"
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
@@ -80,7 +80,7 @@ TfLiteStatus SqueezePrepare(TfLiteContext* context, TfLiteNode* node) {
   // Ensure output dimensions are big enough.
   for (int in_idx = 0, out_idx = 0; in_idx < input_num_dims; ++in_idx) {
     if (!should_squeeze[in_idx]) {
-      TFLITE_CHECK_GE(output_dims->data[out_idx++], input_dims->data[in_idx]);
+      TFLITE_DCHECK_GE(output_dims->data[out_idx++], input_dims->data[in_idx]);
     }
   }
 

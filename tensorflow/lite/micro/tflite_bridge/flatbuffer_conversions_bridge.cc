@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.h"
 
-#include "tensorflow/lite/c/c_api_types.h"
+#include "tensorflow/lite/core/c/c_api_types.h"
 #include "tensorflow/lite/core/api/error_reporter.h"
 #include "tensorflow/lite/core/api/flatbuffer_conversions.h"
 #include "tensorflow/lite/micro/tflite_bridge/micro_error_reporter.h"

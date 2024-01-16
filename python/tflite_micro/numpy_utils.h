@@ -19,7 +19,7 @@ limitations under the License.
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/ndarraytypes.h>
 
-#include "tensorflow/lite/c/c_api_types.h"
+#include "tensorflow/lite/core/c/c_api_types.h"
 
 namespace tflite {
 

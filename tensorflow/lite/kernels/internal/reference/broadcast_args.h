@@ -44,7 +44,7 @@ void BroadcastArgs(const RuntimeShape& input1_shape, const T* input1_data,
     } else if (shape2_i == 1) {
       output_data[backward_i] = shape1_i;
     } else {
-      TFLITE_CHECK_EQ(shape1_i, shape2_i);
+      TFLITE_DCHECK_EQ(shape1_i, shape2_i);
       output_data[backward_i] = shape1_i;
     }
   }

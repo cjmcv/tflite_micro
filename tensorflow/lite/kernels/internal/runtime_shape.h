@@ -110,7 +110,7 @@ class RuntimeShape {
       : size_(new_shape_size) {
     // If the following check fails, it is likely because a 4D-only kernel is
     // being used with an array of larger dimension count.
-    TFLITE_CHECK_GE(new_shape_size, shape.DimensionsCount());
+    TFLITE_DCHECK_GE(new_shape_size, shape.DimensionsCount());
     const int size_increase = new_shape_size - shape.DimensionsCount();
     for (int i = 0; i < size_increase; ++i) {
       SetDim(i, pad_value);

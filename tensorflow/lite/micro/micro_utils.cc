@@ -19,7 +19,7 @@ limitations under the License.
 #include <cstdint>
 #include <limits>
 
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/compatibility.h"
 #include "tensorflow/lite/kernels/op_macros.h"
 #include "tensorflow/lite/micro/memory_helpers.h"
@@ -63,7 +63,9 @@ void SignedSymmetricPerChannelQuantize(
     channel_stride = 1;
   } else {
     MicroPrintf("quantized dimension must be 0 or 3");
-    TFLITE_ABORT;
+    channel_stride = 1;
+    stride = 1;
+    TFLITE_ASSERT_FALSE;
   }
 
   // Calculate scales for each channel.

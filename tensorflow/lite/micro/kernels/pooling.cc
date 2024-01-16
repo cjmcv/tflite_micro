@@ -14,7 +14,7 @@ limitations under the License.
 ==============================================================================*/
 #include "tensorflow/lite/kernels/internal/reference/pooling.h"
 
-#include "tensorflow/lite/c/builtin_op_data.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
 #include "tensorflow/lite/micro/kernels/pooling.h"

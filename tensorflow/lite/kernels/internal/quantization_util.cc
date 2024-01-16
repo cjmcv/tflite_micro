@@ -72,12 +72,12 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
   const double q = std::frexp(double_multiplier, shift);
   auto q_fixed = static_cast<int64_t>(TfLiteRound(q * (1LL << 31)));
 #endif  // TFLITE_EMULATE_FLOAT
-  TFLITE_CHECK(q_fixed <= (1LL << 31));
+  TFLITE_DCHECK(q_fixed <= (1LL << 31));
   if (q_fixed == (1LL << 31)) {
     q_fixed /= 2;
     ++*shift;
   }
-  TFLITE_CHECK_LE(q_fixed, std::numeric_limits<int32_t>::max());
+  TFLITE_DCHECK_LE(q_fixed, std::numeric_limits<int32_t>::max());
   // A shift amount smaller than -31 would cause all bits to be shifted out
   // and thus all results would be zero. We implement that instead with
   // q_fixed==0, so as to avoid hitting issues with right-shift
@@ -106,25 +106,25 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
 void QuantizeMultiplierGreaterThanOne(double double_multiplier,
                                       int32_t* quantized_multiplier,
                                       int* left_shift) {
-  TFLITE_CHECK_GT(double_multiplier, 1.);
+  TFLITE_DCHECK_GT(double_multiplier, 1.);
   QuantizeMultiplier(double_multiplier, quantized_multiplier, left_shift);
-  TFLITE_CHECK_GE(*left_shift, 0);
+  TFLITE_DCHECK_GE(*left_shift, 0);
 }
 
 void QuantizeMultiplierSmallerThanOneExp(double double_multiplier,
                                          int32_t* quantized_multiplier,
                                          int* left_shift) {
-  TFLITE_CHECK_LT(double_multiplier, 1.);
-  TFLITE_CHECK_GT(double_multiplier, 0.);
+  TFLITE_DCHECK_LT(double_multiplier, 1.);
+  TFLITE_DCHECK_GT(double_multiplier, 0.);
   int shift;
   QuantizeMultiplier(double_multiplier, quantized_multiplier, &shift);
-  TFLITE_CHECK_LE(shift, 0);
+  TFLITE_DCHECK_LE(shift, 0);
   *left_shift = shift;
 }
 
 int64_t IntegerFrExp(double input, int* shift) {
   // Make sure our assumptions about the double layout hold.
-  TFLITE_CHECK_EQ(8, sizeof(double));
+  TFLITE_DCHECK_EQ(8, sizeof(double));
 
   // We want to access the bits of the input double value directly, which is
   // tricky to do safely, so use a union to handle the casting.

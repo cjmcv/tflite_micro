@@ -28,8 +28,8 @@ limitations under the License.
 #include "tensorflow/lite/array.h"
 #endif  // TF_LITE_STATIC_MEMORY
 
-#include "tensorflow/lite/context_util.h"
-#include "tensorflow/lite/core/c/builtin_op_data.h"
+// #include "tensorflow/lite/context_util.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
 #include "tensorflow/lite/kernels/internal/quantization_util.h"
@@ -577,17 +577,6 @@ bool IsMobilePlatform() {
   return true;
 #endif
 #endif
-  return false;
-}
-
-bool HasUnspecifiedDimension(const TfLiteTensor* tensor) {
-#ifndef TF_LITE_STATIC_MEMORY
-  if (tensor->dims_signature) {
-    for (int i : TfLiteIntArrayView(tensor->dims_signature)) {
-      if (i == -1) return true;
-    }
-  }
-#endif  // TF_LITE_STATIC_MEMORY
   return false;
 }
 

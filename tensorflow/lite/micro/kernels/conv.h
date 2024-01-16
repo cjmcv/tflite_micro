@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <cstdint>
 
-#include "tensorflow/lite/c/builtin_op_data.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 #include "tensorflow/lite/micro/micro_common.h"
 

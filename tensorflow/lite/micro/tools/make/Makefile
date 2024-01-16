@@ -22,11 +22,11 @@ endif
 # 构建动态库
 IS_BUILD_DYNAMIC := 0
 # 是否编译测试代码
-IS_BUILD_TEST := 0
+IS_BUILD_TEST := 1
 # 是否编译signal模块
-IS_BUILD_SIGNAL := 0
+IS_BUILD_SIGNAL := 1
 # kiss fft
-IS_BUILD_KISS_FFT := 0
+IS_BUILD_KISS_FFT := 1
 
 # root directory of tensorflow
 TENSORFLOW_ROOT :=
@@ -155,7 +155,7 @@ TARGET_TOOLCHAIN_ROOT :=
 # This default build is most suited for usual development and testing as is
 # highlighted by the discussion on this github pull request:
 # https://github.com/tensorflow/tensorflow/pull/42314#issuecomment-694360567
-BUILD_TYPE := default
+BUILD_TYPE := release_with_logs
 ifeq ($(BUILD_TYPE), debug)
 	# Specifying BUILD_TYPE=debug adds debug symbols to the binary (and makes it
 	# larger) and should be used to run a binary with gdb.
@@ -355,6 +355,20 @@ $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/memory_planner/*.cc) \
 $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tflite_bridge/*.cc) \
 $(TFL_CC_SRCS)
 
+ifneq ($(IS_BUILD_TEST), 1)
+  EXCLUDED_MICROLITE_CC_SRCS := \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/memory_planner/non_persistent_buffer_planner_shim.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/arena_allocator/recording_single_arena_buffer_allocator.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/fake_micro_context.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/mock_micro_graph.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/micro_profiler.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/recording_micro_allocator.cc \
+    $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc \
+  	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc
+
+  MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
+endif
+
 # TODO(b/165940489): Figure out how to avoid including fixed point
 # platform-specific headers.
 THIRD_PARTY_CC_HDRS := \
@@ -489,16 +503,6 @@ all: $(MICROLITE_LIB_PATH)
 # Include output directory since example cc files depend on generated headers.
 INCLUDES += -I$(GENERATED_SRCS_DIR)
 INCLUDES += -I$(GENERATED_SRCS_DIR)$(TENSORFLOW_ROOT)
-
-ifneq ($(IS_BUILD_TEST), 1)
-  EXCLUDED_MICROLITE_CC_SRCS := \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/fake_micro_context.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernel_runner.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/mock_micro_graph.cc \
-  	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc
-  MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
-endif
 
 MICROLITE_LIB_OBJS := $(addprefix $(CORE_OBJDIR), \
 $(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_SRCS)))))

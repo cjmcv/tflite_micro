@@ -18,7 +18,7 @@ limitations under the License.
 #include <algorithm>
 #include <limits>
 
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
 #include "tensorflow/lite/kernels/internal/quantization_util.h"
 #include "tensorflow/lite/kernels/internal/reference/process_broadcast_shapes.h"
@@ -48,7 +48,7 @@ void PopulateLookupTable(const TfLiteTensor* input, const TfLiteTensor* output,
                          const TransformFunc transform, OpData* data) {
   if (sizeof(T) != 1) {
     MicroPrintf("Lookup table valid only for 8bit");
-    TFLITE_ABORT;
+    TFLITE_ASSERT_FALSE;
   }
 
   const float inverse_scale = 1 / output->params.scale;

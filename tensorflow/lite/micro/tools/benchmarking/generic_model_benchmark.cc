@@ -21,15 +21,15 @@ limitations under the License.
 #include <memory>
 #include <random>
 
-#include "tensorflow/lite/c/c_api_types.h"
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/c_api_types.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/micro_op_resolver.h"
 #include "tensorflow/lite/micro/micro_profiler.h"
 #include "tensorflow/lite/micro/recording_micro_allocator.h"
 #include "tensorflow/lite/micro/recording_micro_interpreter.h"
-#include "tensorflow/lite/micro/system_setup.h"
+// #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/micro/tools/benchmarking/metrics.h"
 #include "tensorflow/lite/micro/tools/benchmarking/op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"

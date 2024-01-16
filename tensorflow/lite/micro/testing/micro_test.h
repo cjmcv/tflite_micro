@@ -54,9 +54,9 @@ limitations under the License.
 #include <limits>
 #include <type_traits>
 
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/micro_log.h"
-#include "tensorflow/lite/micro/system_setup.h"
+// #include "tensorflow/lite/micro/system_setup.h"
 
 namespace micro_test {
 extern int tests_passed;
@@ -64,19 +64,6 @@ extern int tests_failed;
 extern bool is_test_complete;
 extern bool did_test_fail;
 }  // namespace micro_test
-
-namespace tflite {
-
-// This additional helper function is used (instead of directly calling
-// tflite::InitializeTarget from the TF_LITE_MICRO_TESTS_BEGIN macro) to avoid
-// adding a dependency from every bazel test target to micro:system_setp (which
-// is the target that implements InitializeTarget().
-//
-// The underlying issue here is that the use of the macros results in
-// dependencies that can be containted within the micro/testing:micro_test
-// target bleeding on to all the tests.
-inline void InitializeTest() { InitializeTarget(); }
-}  // namespace tflite
 
 #define TF_LITE_MICRO_TESTS_BEGIN   \
   namespace micro_test {            \
@@ -89,7 +76,6 @@ inline void InitializeTest() { InitializeTarget(); }
   int main(int argc, char** argv) { \
     micro_test::tests_passed = 0;   \
     micro_test::tests_failed = 0;   \
-    tflite::InitializeTest();
 
 #define TF_LITE_MICRO_TESTS_END                                       \
   MicroPrintf("%d/%d tests passed", micro_test::tests_passed,         \

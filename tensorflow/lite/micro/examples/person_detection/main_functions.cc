@@ -22,7 +22,6 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/models/person_detect_model_data.h"
-#include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
@@ -45,7 +44,6 @@ alignas(16) static uint8_t tensor_arena[kTensorArenaSize];
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
-  tflite::InitializeTarget();
 
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
