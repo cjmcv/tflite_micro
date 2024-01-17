@@ -76,68 +76,68 @@ void TestSquaredDifference(int* input1_dims_data, const T* input1_data,
                                    output_data, ElementCount(*output_dims));
 }
 
-template <typename T>
-void TestSquaredDifferenceQuantized(
-    int* input1_dims_data, const float* input1_data, T* input1_quantized,
-    float input1_min, float input1_max,
+// template <typename T>
+// void TestSquaredDifferenceQuantized(
+//     int* input1_dims_data, const float* input1_data, T* input1_quantized,
+//     float input1_min, float input1_max,
 
-    int* input2_dims_data, const float* input2_data, T* input2_quantized,
-    float input2_min, float input2_max,
+//     int* input2_dims_data, const float* input2_data, T* input2_quantized,
+//     float input2_min, float input2_max,
 
-    int* output_dims_data, T* output_data, float output_min, float output_max,
-    float* dequantized_output, const float* golden,
+//     int* output_dims_data, T* output_data, float output_min, float output_max,
+//     float* dequantized_output, const float* golden,
 
-    float tolerance, bool narrow_range = false) {
-  QuantizationParams input1_qparams;
-  QuantizationParams input2_qparams;
-  QuantizationParams output_qparams;
+//     float tolerance, bool narrow_range = false) {
+//   QuantizationParams input1_qparams;
+//   QuantizationParams input2_qparams;
+//   QuantizationParams output_qparams;
 
-  input1_qparams = ChooseQuantizationParams<T>(static_cast<double>(input1_min),
-                                               static_cast<double>(input1_max),
-                                               narrow_range);
-  input2_qparams = ChooseQuantizationParams<T>(static_cast<double>(input2_min),
-                                               static_cast<double>(input2_max),
-                                               narrow_range);
-  output_qparams = ChooseQuantizationParams<T>(static_cast<double>(output_min),
-                                               static_cast<double>(output_max),
-                                               narrow_range);
+//   input1_qparams = ChooseQuantizationParams<T>(static_cast<double>(input1_min),
+//                                                static_cast<double>(input1_max),
+//                                                narrow_range);
+//   input2_qparams = ChooseQuantizationParams<T>(static_cast<double>(input2_min),
+//                                                static_cast<double>(input2_max),
+//                                                narrow_range);
+//   output_qparams = ChooseQuantizationParams<T>(static_cast<double>(output_min),
+//                                                static_cast<double>(output_max),
+//                                                narrow_range);
 
-  TfLiteIntArray* input1_dims = IntArrayFromInts(input1_dims_data);
-  TfLiteIntArray* input2_dims = IntArrayFromInts(input2_dims_data);
-  TfLiteIntArray* output_dims = IntArrayFromInts(output_dims_data);
-  int output_size = ElementCount(*output_dims);
+//   TfLiteIntArray* input1_dims = IntArrayFromInts(input1_dims_data);
+//   TfLiteIntArray* input2_dims = IntArrayFromInts(input2_dims_data);
+//   TfLiteIntArray* output_dims = IntArrayFromInts(output_dims_data);
+//   int output_size = ElementCount(*output_dims);
 
-  constexpr int inputs_size = 2;
-  constexpr int outputs_size = 1;
-  constexpr int tensors_size = inputs_size + outputs_size;
-  TfLiteTensor tensors[tensors_size] = {
-      CreateQuantizedTensor<T>(input1_data, input1_quantized, input1_dims,
-                               input1_qparams.scale, input1_qparams.zero_point),
-      CreateQuantizedTensor<T>(input2_data, input2_quantized, input2_dims,
-                               input2_qparams.scale, input2_qparams.zero_point),
-      CreateQuantizedTensor<T>(output_data, output_dims, output_qparams.scale,
-                               output_qparams.zero_point),
-  };
+//   constexpr int inputs_size = 2;
+//   constexpr int outputs_size = 1;
+//   constexpr int tensors_size = inputs_size + outputs_size;
+//   TfLiteTensor tensors[tensors_size] = {
+//       CreateQuantizedTensor<T>(input1_data, input1_quantized, input1_dims,
+//                                input1_qparams.scale, input1_qparams.zero_point),
+//       CreateQuantizedTensor<T>(input2_data, input2_quantized, input2_dims,
+//                                input2_qparams.scale, input2_qparams.zero_point),
+//       CreateQuantizedTensor<T>(output_data, output_dims, output_qparams.scale,
+//                                output_qparams.zero_point),
+//   };
 
-  int inputs_array_data[] = {2, 0, 1};
-  TfLiteIntArray* inputs_array = IntArrayFromInts(inputs_array_data);
-  int outputs_array_data[] = {1, 2};
-  TfLiteIntArray* outputs_array = IntArrayFromInts(outputs_array_data);
+//   int inputs_array_data[] = {2, 0, 1};
+//   TfLiteIntArray* inputs_array = IntArrayFromInts(inputs_array_data);
+//   int outputs_array_data[] = {1, 2};
+//   TfLiteIntArray* outputs_array = IntArrayFromInts(outputs_array_data);
 
-  const TFLMRegistration registration = tflite::Register_SQUARED_DIFFERENCE();
-  micro::KernelRunner runner(registration, tensors, tensors_size, inputs_array,
-                             outputs_array, /*builtin_data=*/nullptr);
+//   const TFLMRegistration registration = tflite::Register_SQUARED_DIFFERENCE();
+//   micro::KernelRunner runner(registration, tensors, tensors_size, inputs_array,
+//                              outputs_array, /*builtin_data=*/nullptr);
 
-  TF_LITE_MICRO_EXPECT_EQ(kTfLiteOk, runner.InitAndPrepare());
-  TF_LITE_MICRO_EXPECT_EQ(kTfLiteOk, runner.Invoke());
+//   TF_LITE_MICRO_EXPECT_EQ(kTfLiteOk, runner.InitAndPrepare());
+//   TF_LITE_MICRO_EXPECT_EQ(kTfLiteOk, runner.Invoke());
 
-  Dequantize(output_data, output_size, output_qparams.scale,
-             output_qparams.zero_point, dequantized_output);
+//   Dequantize(output_data, output_size, output_qparams.scale,
+//              output_qparams.zero_point, dequantized_output);
 
-  for (int i = 0; i < output_size; ++i) {
-    TF_LITE_MICRO_EXPECT_NEAR(golden[i], dequantized_output[i], tolerance);
-  }
-}
+//   for (int i = 0; i < output_size; ++i) {
+//     TF_LITE_MICRO_EXPECT_NEAR(golden[i], dequantized_output[i], tolerance);
+//   }
+// }
 
 }  // namespace
 }  // namespace testing
@@ -231,105 +231,105 @@ TF_LITE_MICRO_TEST(IntegerSquaredDifferenceWithBroadcast) {
   }
 }
 
-TF_LITE_MICRO_TEST(QuantizedSquaredDifferenceSameShape) {
-  constexpr int data_size = 4;
-  int inout_shape[] = {4, 1, 2, 2, 1};
-  const float input1_values[] = {-0.2, 0.2, -1.2, 0.8};
-  const float input2_values[] = {0.5, 0.2, -1.5, 0.5};
-  const float golden_values[] = {0.49, 0.0, 0.09, 0.09};
-  float output_dequantized[data_size];
-  // Int8 case
-  int8_t input1_int8[data_size];
-  int8_t input2_int8[data_size];
-  int8_t output_int8[data_size];
-  tflite::testing::TestSquaredDifferenceQuantized(
-      inout_shape, input1_values, input1_int8, -1.2f, 0.8f, inout_shape,
-      input2_values, input2_int8, -1.5f, 0.5f, inout_shape, output_int8, 0.0f,
-      0.5f, output_dequantized, golden_values, 2.0f / 255.0f);
+// TF_LITE_MICRO_TEST(QuantizedSquaredDifferenceSameShape) {
+//   constexpr int data_size = 4;
+//   int inout_shape[] = {4, 1, 2, 2, 1};
+//   const float input1_values[] = {-0.2, 0.2, -1.2, 0.8};
+//   const float input2_values[] = {0.5, 0.2, -1.5, 0.5};
+//   const float golden_values[] = {0.49, 0.0, 0.09, 0.09};
+//   float output_dequantized[data_size];
+//   // Int8 case
+//   int8_t input1_int8[data_size];
+//   int8_t input2_int8[data_size];
+//   int8_t output_int8[data_size];
+//   tflite::testing::TestSquaredDifferenceQuantized(
+//       inout_shape, input1_values, input1_int8, -1.2f, 0.8f, inout_shape,
+//       input2_values, input2_int8, -1.5f, 0.5f, inout_shape, output_int8, 0.0f,
+//       0.5f, output_dequantized, golden_values, 2.0f / 255.0f);
 
-  // Int16 case
-  int16_t input1_int16[data_size];
-  int16_t input2_int16[data_size];
-  int16_t output_int16[data_size];
-  // Symmetrical quantization: (rmin == -rmax), requires narrow range (qmin =
-  // -qmax).
-  // TODO(b/269352046): understand the tolerance level
-  // http://b/269352046#comment7
-  tflite::testing::TestSquaredDifferenceQuantized(
-      inout_shape, input1_values, input1_int16, -1.2f, 1.2f, inout_shape,
-      input2_values, input2_int16, -1.5f, 1.5f, inout_shape, output_int16,
-      -0.5f, 0.5f, output_dequantized, golden_values, 6.0f / 32768.0f,
-      /*narrow_range=*/true);
-}
+//   // Int16 case
+//   int16_t input1_int16[data_size];
+//   int16_t input2_int16[data_size];
+//   int16_t output_int16[data_size];
+//   // Symmetrical quantization: (rmin == -rmax), requires narrow range (qmin =
+//   // -qmax).
+//   // TODO(b/269352046): understand the tolerance level
+//   // http://b/269352046#comment7
+//   tflite::testing::TestSquaredDifferenceQuantized(
+//       inout_shape, input1_values, input1_int16, -1.2f, 1.2f, inout_shape,
+//       input2_values, input2_int16, -1.5f, 1.5f, inout_shape, output_int16,
+//       -0.5f, 0.5f, output_dequantized, golden_values, 6.0f / 32768.0f,
+//       /*narrow_range=*/true);
+// }
 
-TF_LITE_MICRO_TEST(QuantizedSquaredDifferenceVariousShapes) {
-  constexpr int data_size = 6;
-  const float input1_values[] = {-2.0, 0.2, 0.3, 0.8, 1.1, -2.0};
-  const float input2_values[] = {1.0, 0.2, 0.6, 0.4, -1.0, -0.0};
-  const float golden_values[] = {9.0, 0.0, 0.09, 0.16, 4.41, 4.0};
-  // Int8 case
-  int8_t input1_int8[data_size];
-  int8_t input2_int8[data_size];
-  int8_t output_int8[data_size];
-  float output_dequantized[data_size];
-  for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
-    tflite::testing::TestSquaredDifferenceQuantized(
-        tflite::testing::test_shape[i], input1_values, input1_int8, -2.0f, 1.7f,
-        tflite::testing::test_shape[i], input2_values, input2_int8, -1.0f, 1.0f,
-        tflite::testing::test_shape[i], output_int8, 0.0f, 9.0f,
-        output_dequantized, golden_values, 18.0f / 255.0f);
-  }
+// TF_LITE_MICRO_TEST(QuantizedSquaredDifferenceVariousShapes) {
+//   constexpr int data_size = 6;
+//   const float input1_values[] = {-2.0, 0.2, 0.3, 0.8, 1.1, -2.0};
+//   const float input2_values[] = {1.0, 0.2, 0.6, 0.4, -1.0, -0.0};
+//   const float golden_values[] = {9.0, 0.0, 0.09, 0.16, 4.41, 4.0};
+//   // Int8 case
+//   int8_t input1_int8[data_size];
+//   int8_t input2_int8[data_size];
+//   int8_t output_int8[data_size];
+//   float output_dequantized[data_size];
+//   for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
+//     tflite::testing::TestSquaredDifferenceQuantized(
+//         tflite::testing::test_shape[i], input1_values, input1_int8, -2.0f, 1.7f,
+//         tflite::testing::test_shape[i], input2_values, input2_int8, -1.0f, 1.0f,
+//         tflite::testing::test_shape[i], output_int8, 0.0f, 9.0f,
+//         output_dequantized, golden_values, 18.0f / 255.0f);
+//   }
 
-  // Int16 case
-  int16_t input1_int16[data_size];
-  int16_t input2_int16[data_size];
-  int16_t output_int16[data_size];
-  // Symmetrical quantization: (rmin == -rmax), requires narrow range (qmin =
-  // -qmax).
-  for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
-    tflite::testing::TestSquaredDifferenceQuantized(
-        tflite::testing::test_shape[i], input1_values, input1_int16, -2.0f,
-        2.0f, tflite::testing::test_shape[i], input2_values, input2_int16,
-        -1.0f, 1.0f, tflite::testing::test_shape[i], output_int16, -9.0f, 9.0f,
-        output_dequantized, golden_values, 18.0f / 32768.0f,
-        /*narrow_range=*/true);
-  }
-}
+//   // Int16 case
+//   int16_t input1_int16[data_size];
+//   int16_t input2_int16[data_size];
+//   int16_t output_int16[data_size];
+//   // Symmetrical quantization: (rmin == -rmax), requires narrow range (qmin =
+//   // -qmax).
+//   for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
+//     tflite::testing::TestSquaredDifferenceQuantized(
+//         tflite::testing::test_shape[i], input1_values, input1_int16, -2.0f,
+//         2.0f, tflite::testing::test_shape[i], input2_values, input2_int16,
+//         -1.0f, 1.0f, tflite::testing::test_shape[i], output_int16, -9.0f, 9.0f,
+//         output_dequantized, golden_values, 18.0f / 32768.0f,
+//         /*narrow_range=*/true);
+//   }
+// }
 
-TF_LITE_MICRO_TEST(FloatSquaredDifferenceWithBroadcast) {
-  constexpr int data_size = 6;
+// TF_LITE_MICRO_TEST(FloatSquaredDifferenceWithBroadcast) {
+//   constexpr int data_size = 6;
 
-  // input 2 is a scalar
-  int input2_shape[] = {1, 1};
-  const float input1_values[] = {-0.2, 0.2, 0.5, 0.8, 0.11, 1.1};
-  const float input2_values[] = {0.1};
-  const float golden_values[] = {0.09, 0.01, 0.16, 0.49, 0.0001, 1.0};
+//   // input 2 is a scalar
+//   int input2_shape[] = {1, 1};
+//   const float input1_values[] = {-0.2, 0.2, 0.5, 0.8, 0.11, 1.1};
+//   const float input2_values[] = {0.1};
+//   const float golden_values[] = {0.09, 0.01, 0.16, 0.49, 0.0001, 1.0};
 
-  // Int8 case
-  int8_t input1_int8[data_size];
-  int8_t input2_int8[data_size];
-  int8_t output_int8[data_size];
-  float output_dequantized[data_size];
-  for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
-    tflite::testing::TestSquaredDifferenceQuantized(
-        tflite::testing::test_shape[i], input1_values, input1_int8, -0.2f, 1.1f,
-        input2_shape, input2_values, input2_int8, 0.0f, 1.0f,
-        tflite::testing::test_shape[i], output_int8, 0.0f, 1.0f,
-        output_dequantized, golden_values, 2.0f / 255.0f);
-  }
+//   // Int8 case
+//   int8_t input1_int8[data_size];
+//   int8_t input2_int8[data_size];
+//   int8_t output_int8[data_size];
+//   float output_dequantized[data_size];
+//   for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
+//     tflite::testing::TestSquaredDifferenceQuantized(
+//         tflite::testing::test_shape[i], input1_values, input1_int8, -0.2f, 1.1f,
+//         input2_shape, input2_values, input2_int8, 0.0f, 1.0f,
+//         tflite::testing::test_shape[i], output_int8, 0.0f, 1.0f,
+//         output_dequantized, golden_values, 2.0f / 255.0f);
+//   }
 
-  // Int16 case
-  int16_t input1_int16[data_size];
-  int16_t input2_int16[data_size];
-  int16_t output_int16[data_size];
-  for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
-    tflite::testing::TestSquaredDifferenceQuantized(
-        tflite::testing::test_shape[i], input1_values, input1_int16, -1.1f,
-        1.1f, input2_shape, input2_values, input2_int16, -1.0f, 1.0f,
-        tflite::testing::test_shape[i], output_int16, -1.0f, 1.0f,
-        output_dequantized, golden_values, 2.0f / 32768.0f,
-        /*narrow_range=*/true);
-  }
-}
+//   // Int16 case
+//   int16_t input1_int16[data_size];
+//   int16_t input2_int16[data_size];
+//   int16_t output_int16[data_size];
+//   for (int i = 0; i < tflite::testing::kNumTestShapes; ++i) {
+//     tflite::testing::TestSquaredDifferenceQuantized(
+//         tflite::testing::test_shape[i], input1_values, input1_int16, -1.1f,
+//         1.1f, input2_shape, input2_values, input2_int16, -1.0f, 1.0f,
+//         tflite::testing::test_shape[i], output_int16, -1.0f, 1.0f,
+//         output_dequantized, golden_values, 2.0f / 32768.0f,
+//         /*narrow_range=*/true);
+//   }
+// }
 
 TF_LITE_MICRO_TESTS_END

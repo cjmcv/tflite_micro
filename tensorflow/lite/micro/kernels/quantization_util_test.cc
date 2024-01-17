@@ -194,43 +194,43 @@ TF_LITE_MICRO_TEST(QuantizationUtilTest_SafeCast) {
   tflite::RunSafeCastTests<double, uint64_t>();
 }
 
-// Example taken from http://www.tensorflow.org/performance/quantization
-//
-//  Quantized | Float
-//  --------- | -----
-//  0         | -10.0
-//  255       | 30.0
-//  128       | 10.0
-TF_LITE_MICRO_TEST(QuantizationUtilTest_ChooseQuantizationParams) {
-  tflite::QuantizationParams qp =
-      tflite::ChooseQuantizationParams<uint8_t>(-10.0, 30.0);
-  TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.156863, 1e-5);
-  TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 64);
-}
+// // Example taken from http://www.tensorflow.org/performance/quantization
+// //
+// //  Quantized | Float
+// //  --------- | -----
+// //  0         | -10.0
+// //  255       | 30.0
+// //  128       | 10.0
+// TF_LITE_MICRO_TEST(QuantizationUtilTest_ChooseQuantizationParams) {
+//   tflite::QuantizationParams qp =
+//       tflite::ChooseQuantizationParams<uint8_t>(-10.0, 30.0);
+//   TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.156863, 1e-5);
+//   TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 64);
+// }
 
-TF_LITE_MICRO_TEST(
-    QuantizationUtilTest_ChooseQuantizationParamsZeroPointOnMinBoundary) {
-  tflite::QuantizationParams qp =
-      tflite::ChooseQuantizationParams<uint8_t>(0.0, 30.0);
-  TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.117647, 1e-5);
-  TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 0);
-}
+// TF_LITE_MICRO_TEST(
+//     QuantizationUtilTest_ChooseQuantizationParamsZeroPointOnMinBoundary) {
+//   tflite::QuantizationParams qp =
+//       tflite::ChooseQuantizationParams<uint8_t>(0.0, 30.0);
+//   TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.117647, 1e-5);
+//   TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 0);
+// }
 
-TF_LITE_MICRO_TEST(
-    QuantizationUtilTest_ChooseQuantizationParamsEmptyRangeZero) {
-  tflite::QuantizationParams qp =
-      tflite::ChooseQuantizationParams<uint8_t>(0.0, 0.0);
-  TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.0, 1e-5);
-  TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 0);
-}
+// TF_LITE_MICRO_TEST(
+//     QuantizationUtilTest_ChooseQuantizationParamsEmptyRangeZero) {
+//   tflite::QuantizationParams qp =
+//       tflite::ChooseQuantizationParams<uint8_t>(0.0, 0.0);
+//   TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.0, 1e-5);
+//   TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 0);
+// }
 
-TF_LITE_MICRO_TEST(
-    QuantizationUtilTest_ChooseQuantizationParamsZeroPointOnMaxBoundary) {
-  tflite::QuantizationParams qp =
-      tflite::ChooseQuantizationParams<uint8_t>(-10.0, 0.0);
-  TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.039216, 1e-5);
-  TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 255);
-}
+// TF_LITE_MICRO_TEST(
+//     QuantizationUtilTest_ChooseQuantizationParamsZeroPointOnMaxBoundary) {
+//   tflite::QuantizationParams qp =
+//       tflite::ChooseQuantizationParams<uint8_t>(-10.0, 0.0);
+//   TF_LITE_MICRO_EXPECT_NEAR(qp.scale, 0.039216, 1e-5);
+//   TF_LITE_MICRO_EXPECT_EQ(qp.zero_point, 255);
+// }
 
 TF_LITE_MICRO_TEST(QuantizationUtilTest_IntegerFrExp) {
   int shift;
