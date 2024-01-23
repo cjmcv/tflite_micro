@@ -52,11 +52,7 @@ constexpr uint32_t kFractionRoundingThreshold = 0x00200000;
 
 void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
                         int* shift) {
-#if TFLITE_SINGLE_ROUNDING
-  // Single-rounding MultiplyByQuantizedMultiplier only supports positive
-  // multipliers.
-  // TFLITE_DCHECK(double_multiplier >= 0);
-#endif
+
   if (double_multiplier == 0.) {
     *quantized_multiplier = 0;
     *shift = 0;
@@ -92,14 +88,7 @@ void QuantizeMultiplier(double double_multiplier, int32_t* quantized_multiplier,
     *shift = 0;
     q_fixed = 0;
   }
-#if TFLITE_SINGLE_ROUNDING
-  // Single-rounding MultiplyByQuantizedMultiplier doesn't support a shift > 30,
-  // saturate it.
-  if (*shift > 30) {
-    *shift = 30;
-    q_fixed = (1LL << 31) - 1;
-  }
-#endif
+
   *quantized_multiplier = static_cast<int32_t>(q_fixed);
 }
 
@@ -291,11 +280,8 @@ void PreprocessSoftmaxScaling(double beta, double input_scale,
   // result is double equivalent of Q0.31 (actually with more precision). Thus
   // this generates a Q(input_integer_bits).(31-input_integer_bits)
   // representation.
-#if TFLITE_SINGLE_ROUNDING
-  const double max_real_multiplier = (1LL << 30) - 1.0;
-#else
+
   const double max_real_multiplier = (1LL << 31) - 1.0;
-#endif
 
 #ifdef TFLITE_EMULATE_FLOAT
   const double input_beta = IntegerDoubleMultiply(beta, input_scale);
@@ -354,44 +340,6 @@ int CalculateInputRadius(int input_integer_bits, int input_left_shift,
 #endif  // TFLITE_EMULATE_FLOAT
 }
 
-void NudgeQuantizationRange(const float min, const float max,
-                            const int quant_min, const int quant_max,
-                            float* nudged_min, float* nudged_max,
-                            float* nudged_scale) {
-  // This code originates from tensorflow/core/kernels/fake_quant_ops_functor.h.
-  const float quant_min_float = static_cast<float>(quant_min);
-  const float quant_max_float = static_cast<float>(quant_max);
-  *nudged_scale = (max - min) / (quant_max_float - quant_min_float);
-  const float zero_point_from_min = quant_min_float - min / *nudged_scale;
-  uint16_t nudged_zero_point;
-  if (zero_point_from_min < quant_min_float) {
-    nudged_zero_point = static_cast<uint16_t>(quant_min);
-  } else if (zero_point_from_min > quant_max_float) {
-    nudged_zero_point = static_cast<uint16_t>(quant_max);
-  } else {
-    nudged_zero_point = static_cast<uint16_t>(TfLiteRound(zero_point_from_min));
-  }
-  *nudged_min = (quant_min_float - nudged_zero_point) * (*nudged_scale);
-  *nudged_max = (quant_max_float - nudged_zero_point) * (*nudged_scale);
-}
-
-void FakeQuantizeArray(const float nudged_scale, const float nudged_min,
-                       const float nudged_max, const float* input_data,
-                       float* output_data, const float size) {
-  // This code originates from tensorflow/core/kernels/fake_quant_ops_functor.h.
-  const float inv_nudged_scale = 1.0f / nudged_scale;
-
-  for (int i = 0; i < size; i++) {
-    const float src_val = input_data[i];
-    const float clamped = std::min(nudged_max, std::max(nudged_min, src_val));
-    const float clamped_shifted = clamped - nudged_min;
-    const float dst_val =
-        TfLiteRound(clamped_shifted * inv_nudged_scale) * nudged_scale +
-        nudged_min;
-    output_data[i] = dst_val;
-  }
-}
-
 bool CheckedLog2(const float x, int* log2_result) {
   // Using TfLiteRound instead of std::round and std::log instead of
   // std::log2 to work around these functions being missing in a toolchain
@@ -402,15 +350,6 @@ bool CheckedLog2(const float x, int* log2_result) {
 
   *log2_result = static_cast<int>(x_log2_rounded);
   return std::abs(x_log2_fracpart) < 1e-3f;
-}
-
-void QuantizeMultiplierArray(const double* effective_scales, size_t size,
-                             int32_t* effective_scale_significand,
-                             int* effective_shift) {
-  for (size_t i = 0; i < size; ++i) {
-    QuantizeMultiplier(effective_scales[i], &effective_scale_significand[i],
-                       &effective_shift[i]);
-  }
 }
 
 }  // namespace tflite

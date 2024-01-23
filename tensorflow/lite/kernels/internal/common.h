@@ -32,7 +32,6 @@ limitations under the License.
 #include "fixedpoint/fixedpoint.h"
 #include "tensorflow/lite/core/macros.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
-#include "tensorflow/lite/kernels/internal/optimized/neon_check.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 
 namespace tflite {
@@ -200,53 +199,7 @@ inline void BiasAndClamp(float clamp_min, float clamp_max, int bias_size,
   // This turned out to severely regress performance: +4ms (i.e. 8%) on
   // MobileNet v2 / 1.0 / 224. So we keep custom NEON code for now.
   TFLITE_DCHECK_EQ((array_size % bias_size), 0);
-#ifdef USE_NEON
-  float* array_ptr = array_data;
-  float* array_end_ptr = array_ptr + array_size;
-  const auto clamp_min_vec = vdupq_n_f32(clamp_min);
-  const auto clamp_max_vec = vdupq_n_f32(clamp_max);
-  for (; array_ptr != array_end_ptr; array_ptr += bias_size) {
-    int i = 0;
-    for (; i <= bias_size - 16; i += 16) {
-      auto b0 = vld1q_f32(bias_data + i);
-      auto b1 = vld1q_f32(bias_data + i + 4);
-      auto b2 = vld1q_f32(bias_data + i + 8);
-      auto b3 = vld1q_f32(bias_data + i + 12);
-      auto a0 = vld1q_f32(array_ptr + i);
-      auto a1 = vld1q_f32(array_ptr + i + 4);
-      auto a2 = vld1q_f32(array_ptr + i + 8);
-      auto a3 = vld1q_f32(array_ptr + i + 12);
-      auto x0 = vaddq_f32(a0, b0);
-      auto x1 = vaddq_f32(a1, b1);
-      auto x2 = vaddq_f32(a2, b2);
-      auto x3 = vaddq_f32(a3, b3);
-      x0 = vmaxq_f32(clamp_min_vec, x0);
-      x1 = vmaxq_f32(clamp_min_vec, x1);
-      x2 = vmaxq_f32(clamp_min_vec, x2);
-      x3 = vmaxq_f32(clamp_min_vec, x3);
-      x0 = vminq_f32(clamp_max_vec, x0);
-      x1 = vminq_f32(clamp_max_vec, x1);
-      x2 = vminq_f32(clamp_max_vec, x2);
-      x3 = vminq_f32(clamp_max_vec, x3);
-      vst1q_f32(array_ptr + i, x0);
-      vst1q_f32(array_ptr + i + 4, x1);
-      vst1q_f32(array_ptr + i + 8, x2);
-      vst1q_f32(array_ptr + i + 12, x3);
-    }
-    for (; i <= bias_size - 4; i += 4) {
-      auto b = vld1q_f32(bias_data + i);
-      auto a = vld1q_f32(array_ptr + i);
-      auto x = vaddq_f32(a, b);
-      x = vmaxq_f32(clamp_min_vec, x);
-      x = vminq_f32(clamp_max_vec, x);
-      vst1q_f32(array_ptr + i, x);
-    }
-    for (; i < bias_size; i++) {
-      array_ptr[i] = ActivationFunctionWithMinMax(array_ptr[i] + bias_data[i],
-                                                  clamp_min, clamp_max);
-    }
-  }
-#else  // not NEON
+
   for (int array_offset = 0; array_offset < array_size;
        array_offset += bias_size) {
     for (int i = 0; i < bias_size; i++) {
@@ -254,103 +207,8 @@ inline void BiasAndClamp(float clamp_min, float clamp_max, int bias_size,
           array_data[array_offset + i] + bias_data[i], clamp_min, clamp_max);
     }
   }
-#endif
 }
 
-// Single-rounding MultiplyByQuantizedMultiplier
-#if TFLITE_SINGLE_ROUNDING
-inline int32_t MultiplyByQuantizedMultiplier(int32_t x,
-                                             int32_t quantized_multiplier,
-                                             int shift) {
-  TFLITE_DCHECK(quantized_multiplier >= 0);
-  TFLITE_DCHECK(shift >= -31 && shift <= 30);
-
-  const int64_t total_shift = 31 - shift;
-  const int64_t round = static_cast<int64_t>(1) << (total_shift - 1);
-  int64_t result = x * static_cast<int64_t>(quantized_multiplier) + round;
-  result = result >> total_shift;
-
-  TFLITE_DCHECK(result >= std::numeric_limits<int32_t>::min() &&
-                result <= std::numeric_limits<int32_t>::max());
-  return static_cast<int32_t>(result);
-}
-
-inline int32_t MultiplyByQuantizedMultiplierSmallerThanOneExp(
-    int32_t x, int32_t quantized_multiplier, int shift) {
-  TFLITE_DCHECK_LE(shift, 0);
-  return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
-}
-
-inline int32_t MultiplyByQuantizedMultiplierGreaterThanOne(
-    int32_t x, int32_t quantized_multiplier, int shift) {
-  TFLITE_DCHECK_GE(shift, 0);
-  return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
-}
-
-inline int32_t MultiplyByQuantizedMultiplier(int64_t x,
-                                             int32_t quantized_multiplier,
-                                             int shift) {
-  // Inputs:
-  // - quantized_multiplier has fixed point at bit 31
-  // - shift is -31 to +7 (negative for right shift)
-  //
-  // Assumptions: The following input ranges are assumed
-  // - quantize_scale>=0  (the usual range is (1<<30) to (1>>31)-1)
-  // - scaling is chosen so final scaled result fits in int32_t
-  // - input x is in the range -(1<<47) <= x < (1<<47)
-  TFLITE_DCHECK(quantized_multiplier >= 0);
-  TFLITE_DCHECK(shift >= -31 && shift < 8);
-  TFLITE_DCHECK(x >= -(static_cast<int64_t>(1) << 47) &&
-                x < (static_cast<int64_t>(1) << 47));
-
-  const int32_t reduced_multiplier =
-      (quantized_multiplier < 0x7FFF0000)
-          ? ((quantized_multiplier + (1 << 15)) >> 16)
-          : 0x7FFF;
-  const int64_t total_shift = 15 - shift;
-  const int64_t round = static_cast<int64_t>(1) << (total_shift - 1);
-  int64_t result = x * static_cast<int64_t>(reduced_multiplier) + round;
-  result = result >> total_shift;
-
-  TFLITE_DCHECK(result >= std::numeric_limits<int32_t>::min() &&
-                result <= std::numeric_limits<int32_t>::max());
-  return static_cast<int32_t>(result);
-}
-
-#ifdef USE_NEON
-inline int32x4x4_t MultiplyByQuantizedMultiplier4Rows(
-    int32x4x4_t input_val, int32_t quantized_multiplier, int shift) {
-  TFLITE_DCHECK(quantized_multiplier >= 0);
-
-  const int right_shift = std::min(-1, shift);
-  const int left_shift = shift - right_shift;
-
-  const int32x4_t multiplier_dup = vdupq_n_s32(quantized_multiplier);
-  const int32x4_t left_shift_dup = vdupq_n_s32(left_shift);
-  const int32x4_t right_shift_dup = vdupq_n_s32(right_shift);
-
-  int32x4x4_t result;
-  result.val[0] = vrshlq_s32(
-      vqdmulhq_s32(vshlq_s32(input_val.val[0], left_shift_dup), multiplier_dup),
-      right_shift_dup);
-
-  result.val[1] = vrshlq_s32(
-      vqdmulhq_s32(vshlq_s32(input_val.val[1], left_shift_dup), multiplier_dup),
-      right_shift_dup);
-
-  result.val[2] = vrshlq_s32(
-      vqdmulhq_s32(vshlq_s32(input_val.val[2], left_shift_dup), multiplier_dup),
-      right_shift_dup);
-
-  result.val[3] = vrshlq_s32(
-      vqdmulhq_s32(vshlq_s32(input_val.val[3], left_shift_dup), multiplier_dup),
-      right_shift_dup);
-
-  return result;
-}
-#endif  // USE_NEON
-// Double-rounding MultiplyByQuantizedMultiplier
-#else
 inline int32_t MultiplyByQuantizedMultiplierSmallerThanOneExp(
     int32_t x, int32_t quantized_multiplier, int left_shift) {
   using gemmlowp::RoundingDivideByPOT;
@@ -371,43 +229,6 @@ TFLITE_NOINLINE int32_t MultiplyByQuantizedMultiplier(
 
 TFLITE_NOINLINE int32_t MultiplyByQuantizedMultiplier(
     int64_t x, int32_t quantized_multiplier, int shift);
-
-#ifdef USE_NEON
-// Round uses ARM's rounding shift right.
-inline int32x4x4_t MultiplyByQuantizedMultiplier4Rows(
-    int32x4x4_t input_val, int32_t quantized_multiplier, int shift) {
-  const int left_shift = std::max(shift, 0);
-  const int right_shift = std::min(shift, 0);
-  int32x4x4_t result;
-
-  int32x4_t multiplier_dup = vdupq_n_s32(quantized_multiplier);
-  int32x4_t left_shift_dup = vdupq_n_s32(left_shift);
-  int32x4_t right_shift_dup = vdupq_n_s32(right_shift);
-
-  result.val[0] =
-      vrshlq_s32(vqrdmulhq_s32(vshlq_s32(input_val.val[0], left_shift_dup),
-                               multiplier_dup),
-                 right_shift_dup);
-
-  result.val[1] =
-      vrshlq_s32(vqrdmulhq_s32(vshlq_s32(input_val.val[1], left_shift_dup),
-                               multiplier_dup),
-                 right_shift_dup);
-
-  result.val[2] =
-      vrshlq_s32(vqrdmulhq_s32(vshlq_s32(input_val.val[2], left_shift_dup),
-                               multiplier_dup),
-                 right_shift_dup);
-
-  result.val[3] =
-      vrshlq_s32(vqrdmulhq_s32(vshlq_s32(input_val.val[3], left_shift_dup),
-                               multiplier_dup),
-                 right_shift_dup);
-
-  return result;
-}
-#endif  // USE_NEON
-#endif  // TFLITE_SINGLE_ROUNDING
 
 template <typename T>
 int CountLeadingZeros(T integer_input) {

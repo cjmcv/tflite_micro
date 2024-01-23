@@ -214,18 +214,6 @@ inline void AddBroadcast<int32_t>(const int32_t* input_data,
                                   int32_t activation_min,
                                   int32_t activation_max) {
   size_t c = 0;
-#ifdef USE_NEON
-  const int32x4_t vmax = vdupq_n_s32(activation_max);
-  const int32x4_t vmin = vdupq_n_s32(activation_min);
-  const int32x4_t vb = vdupq_n_s32(broadcast_data[0]);
-  for (; c + 4 <= size; c += 4) {
-    const int32x4_t va = vld1q_s32(&input_data[c]);
-    int32x4_t vres = vaddq_s32(va, vb);
-    vres = vmaxq_s32(vmin, vres);
-    vres = vminq_s32(vmax, vres);
-    vst1q_s32(&output_data[c], vres);
-  }
-#endif
   for (; c < size; ++c) {
     output_data[c] = ActivationFunctionWithMinMax<int32_t>(
         input_data[c] + broadcast_data[0], activation_min, activation_max);
@@ -248,18 +236,6 @@ inline void AddElementwise<int32_t>(const int32_t* input1_data,
                                     int32_t activation_min,
                                     int32_t activation_max) {
   size_t c = 0;
-#ifdef USE_NEON
-  const int32x4_t vmax = vdupq_n_s32(activation_max);
-  const int32x4_t vmin = vdupq_n_s32(activation_min);
-  for (; c + 4 <= size; c += 4) {
-    const int32x4_t va = vld1q_s32(&input1_data[c]);
-    const int32x4_t vb = vld1q_s32(&input2_data[c]);
-    int32x4_t vres = vaddq_s32(va, vb);
-    vres = vmaxq_s32(vmin, vres);
-    vres = vminq_s32(vmax, vres);
-    vst1q_s32(&output_data[c], vres);
-  }
-#endif
   for (; c < size; ++c) {
     output_data[c] = ActivationFunctionWithMinMax<int32_t>(
         input1_data[c] + input2_data[c], activation_min, activation_max);

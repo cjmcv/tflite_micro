@@ -19,6 +19,8 @@ endif
 
 ####################
 ## Option
+# debug / release / release_with_logs / no_tf_lite_static_memory
+BUILD_TYPE := release_with_logs
 # 构建动态库
 IS_BUILD_DYNAMIC := 0
 # 是否编译测试代码
@@ -60,13 +62,13 @@ CC_TOOL := gcc
 AR_TOOL := ar
 
 # This is the downloads directory inside the makefiles directory
-DOWNLOADS_DIR := $(MAKEFILE_DIR)/downloads
+3RDPARTY_DIR := $(MAKEFILE_DIR)/3rdparty
 
 INCLUDES := \
 -I. \
--I$(DOWNLOADS_DIR) \
--I$(DOWNLOADS_DIR)/gemmlowp \
--I$(DOWNLOADS_DIR)/flatbuffers/include
+-I$(3RDPARTY_DIR) \
+-I$(3RDPARTY_DIR)/gemmlowp \
+-I$(3RDPARTY_DIR)/flatbuffers/include
 
 ifneq ($(TENSORFLOW_ROOT),)
   INCLUDES += -I$(TENSORFLOW_ROOT)
@@ -155,7 +157,7 @@ TARGET_TOOLCHAIN_ROOT :=
 # This default build is most suited for usual development and testing as is
 # highlighted by the discussion on this github pull request:
 # https://github.com/tensorflow/tensorflow/pull/42314#issuecomment-694360567
-BUILD_TYPE := release_with_logs
+
 ifeq ($(BUILD_TYPE), debug)
 	# Specifying BUILD_TYPE=debug adds debug symbols to the binary (and makes it
 	# larger) and should be used to run a binary with gdb.
@@ -372,41 +374,41 @@ endif
 # TODO(b/165940489): Figure out how to avoid including fixed point
 # platform-specific headers.
 THIRD_PARTY_CC_HDRS := \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/allocator.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/array.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/base.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/buffer.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/buffer_ref.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/code_generator.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/code_generators.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/default_allocator.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/detached_buffer.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/file_manager.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/flatbuffer_builder.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/flatbuffers.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/flex_flat_util.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/flexbuffers.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/grpc.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/hash.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/idl.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/minireflect.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/reflection.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/reflection_generated.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/registry.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/stl_emulation.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/string.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/struct.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/table.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/util.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/vector.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/vector_downward.h \
-$(DOWNLOADS_DIR)/flatbuffers/include/flatbuffers/verifier.h \
-$(DOWNLOADS_DIR)/flatbuffers/LICENSE \
-$(DOWNLOADS_DIR)/gemmlowp/fixedpoint/fixedpoint.h \
-$(DOWNLOADS_DIR)/gemmlowp/fixedpoint/fixedpoint_neon.h \
-$(DOWNLOADS_DIR)/gemmlowp/fixedpoint/fixedpoint_sse.h \
-$(DOWNLOADS_DIR)/gemmlowp/internal/detect_platform.h \
-$(DOWNLOADS_DIR)/gemmlowp/LICENSE
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/allocator.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/array.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/base.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/buffer.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/buffer_ref.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/code_generator.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/code_generators.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/default_allocator.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/detached_buffer.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/file_manager.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flatbuffer_builder.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flatbuffers.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flex_flat_util.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flexbuffers.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/grpc.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/hash.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/idl.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/minireflect.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/reflection.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/reflection_generated.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/registry.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/stl_emulation.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/string.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/struct.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/table.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/util.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/vector.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/vector_downward.h \
+$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/verifier.h \
+$(3RDPARTY_DIR)/flatbuffers/LICENSE \
+$(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint.h \
+$(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint_neon.h \
+$(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint_sse.h \
+$(3RDPARTY_DIR)/gemmlowp/internal/detect_platform.h \
+$(3RDPARTY_DIR)/gemmlowp/LICENSE
 
 # The target-specific makefile must have a name that is exactly
 # TARGET_makefile.inc and is only needed for cross-compilation (i.e. when TARGET
@@ -418,18 +420,18 @@ TARGETS_WITHOUT_MAKEFILES := $(HOST_OS)
 TEST_PASS_STRING:='~~~ALL TESTS PASSED~~~'
 
 ifeq ($(IS_BUILD_KISS_FFT), 1)
-  INCLUDES += -I$(DOWNLOADS_DIR)/kissfft
+  INCLUDES += -I$(3RDPARTY_DIR)/kissfft
 
   # some kiss fft source file has to be included in header sections because
   # the implemenation of three different resolution fft from one single c file.
   # See http://b/201319430 for additional context.
   THIRD_PARTY_CC_HDRS += \
-  $(DOWNLOADS_DIR)/kissfft/COPYING \
-  $(DOWNLOADS_DIR)/kissfft/kiss_fft.c \
-  $(DOWNLOADS_DIR)/kissfft/kiss_fft.h \
-  $(DOWNLOADS_DIR)/kissfft/_kiss_fft_guts.h \
-  $(DOWNLOADS_DIR)/kissfft/tools/kiss_fftr.c \
-  $(DOWNLOADS_DIR)/kissfft/tools/kiss_fftr.h \
+  $(3RDPARTY_DIR)/kissfft/COPYING \
+  $(3RDPARTY_DIR)/kissfft/kiss_fft.c \
+  $(3RDPARTY_DIR)/kissfft/kiss_fft.h \
+  $(3RDPARTY_DIR)/kissfft/_kiss_fft_guts.h \
+  $(3RDPARTY_DIR)/kissfft/tools/kiss_fftr.c \
+  $(3RDPARTY_DIR)/kissfft/tools/kiss_fftr.h \
 
   # Load custom kernels.
   MICROLITE_CC_KERNEL_SRCS += \

@@ -51,18 +51,6 @@ class BuiltinDataAllocator {
   virtual ~BuiltinDataAllocator() {}
 };
 
-// Parse the appropriate data out of the op.
-//
-// This handles builtin data explicitly as there are flatbuffer schemas.
-// If it returns kTfLiteOk, it passes the data out with `builtin_data`. The
-// calling function has to pass in an allocator object, and this allocator
-// will be called to reserve space for the output data. If the calling
-// function's allocator reserves memory on the heap, then it's the calling
-// function's responsibility to free it.
-// If it returns kTfLiteError, `builtin_data` will be `nullptr`.
-TfLiteStatus ParseOpData(const Operator* op, BuiltinOperator op_type,
-                         ErrorReporter* error_reporter,
-                         BuiltinDataAllocator* allocator, void** builtin_data);
 
 // Converts the tensor data type used in the flat buffer to the representation
 // used by the runtime.

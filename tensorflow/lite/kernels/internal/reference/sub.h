@@ -70,18 +70,6 @@ struct SubImpl<int32_t> {
     size_t c = 0;
     int32_t activation_min, activation_max;
     GetActivationParams(params, &activation_min, &activation_max);
-#ifdef USE_NEON
-    const int32x4_t vmax = vdupq_n_s32(activation_max);
-    const int32x4_t vmin = vdupq_n_s32(activation_min);
-    const int32x4_t va = vdupq_n_s32(input1_data[0]);
-    for (; c + 4 <= size; c += 4) {
-      const int32x4_t vb = vld1q_s32(&input2_data[c]);
-      int32x4_t vres = vsubq_s32(va, vb);
-      vres = vmaxq_s32(vmin, vres);
-      vres = vminq_s32(vmax, vres);
-      vst1q_s32(&output_data[c], vres);
-    }
-#endif
     for (; c < size; ++c) {
       output_data[c] = binary_func(input1_data[0], input2_data[c], params);
     }
@@ -95,18 +83,6 @@ struct SubImpl<int32_t> {
     size_t c = 0;
     int32_t activation_min, activation_max;
     GetActivationParams(params, &activation_min, &activation_max);
-#ifdef USE_NEON
-    const int32x4_t vmax = vdupq_n_s32(activation_max);
-    const int32x4_t vmin = vdupq_n_s32(activation_min);
-    const int32x4_t vb = vdupq_n_s32(input2_data[0]);
-    for (; c + 4 <= size; c += 4) {
-      const int32x4_t va = vld1q_s32(&input1_data[c]);
-      int32x4_t vres = vsubq_s32(va, vb);
-      vres = vmaxq_s32(vmin, vres);
-      vres = vminq_s32(vmax, vres);
-      vst1q_s32(&output_data[c], vres);
-    }
-#endif
     for (; c < size; ++c) {
       output_data[c] = binary_func(input1_data[c], input2_data[0], params);
     }
@@ -120,18 +96,6 @@ struct SubImpl<int32_t> {
     size_t c = 0;
     int32_t activation_min, activation_max;
     GetActivationParams(params, &activation_min, &activation_max);
-#ifdef USE_NEON
-    int32x4_t vmax = vdupq_n_s32(activation_max);
-    int32x4_t vmin = vdupq_n_s32(activation_min);
-    for (; c + 4 <= size; c += 4) {
-      const int32x4_t va = vld1q_s32(&input1_data[c]);
-      const int32x4_t vb = vld1q_s32(&input2_data[c]);
-      int32x4_t vres = vsubq_s32(va, vb);
-      vres = vmaxq_s32(vmin, vres);
-      vres = vminq_s32(vmax, vres);
-      vst1q_s32(&output_data[c], vres);
-    }
-#endif
     for (; c < size; ++c) {
       output_data[c] = binary_func(input1_data[c], input2_data[c], params);
     }
