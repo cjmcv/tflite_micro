@@ -112,7 +112,6 @@ struct BroadcastComparison4DSlowCommon {
   NdArrayDesc<4> desc2;
 };
 
-TFLITE_NOINLINE
 BroadcastComparison4DSlowCommon BroadcastComparison4DSlowPreprocess(
     const RuntimeShape& unextended_input1_shape,
     const RuntimeShape& unextended_input2_shape,

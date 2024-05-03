@@ -18,7 +18,7 @@ limitations under the License.
 #include <vector>
 
 #include "tensorflow/lite/core/c/common.h"
-#include "tensorflow/lite/core/macros.h"
+// #include "tensorflow/lite/core/macros.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 
 namespace tflite {
@@ -34,7 +34,7 @@ inline const T* GetTensorData(const TfLiteTensor* tensor) {
                            : nullptr;
 }
 
-TFLITE_NOINLINE RuntimeShape GetTensorShape(const TfLiteTensor* tensor);
+RuntimeShape GetTensorShape(const TfLiteTensor* tensor);
 RuntimeShape GetTensorShape(std::vector<int32_t> data);
 
 }  // namespace tflite

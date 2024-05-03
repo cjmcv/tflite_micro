@@ -211,78 +211,78 @@ void PrintNBytes(const TfLiteTensor* tensor, int n_bytes, const char* prefix) {
   PrintNBytes(tensor_data, n_bytes, prefix);
 }
 
-TfLiteStatus CopyOpInputsToSubgraphInputs(TfLiteContext* context,
-                                          TfLiteNode* node,
-                                          MicroGraph* graph_info,
-                                          int subgraph_idx,
-                                          int first_tensor_idx) {
-  TF_LITE_ENSURE(context,
-                 static_cast<size_t>(node->inputs->size - first_tensor_idx) ==
-                     graph_info->NumSubgraphInputs(subgraph_idx));
-  for (int i = 0; i < node->inputs->size - first_tensor_idx; i++) {
-    const TfLiteEvalTensor* input =
-        tflite::micro::GetEvalInput(context, node, i + first_tensor_idx);
-    TfLiteEvalTensor* subgraph_input =
-        graph_info->GetSubgraphInput(subgraph_idx, i);
-    int bytes = ValidateAndGetTensorSizes(input, subgraph_input);
-    TF_LITE_ENSURE(context, bytes >= 0);
-    memcpy(subgraph_input->data.raw, input->data.raw, bytes);
-  }
-  return kTfLiteOk;
-}
+// TfLiteStatus CopyOpInputsToSubgraphInputs(TfLiteContext* context,
+//                                           TfLiteNode* node,
+//                                           MicroGraph* graph_info,
+//                                           int subgraph_idx,
+//                                           int first_tensor_idx) {
+//   TF_LITE_ENSURE(context,
+//                  static_cast<size_t>(node->inputs->size - first_tensor_idx) ==
+//                      graph_info->NumSubgraphInputs(subgraph_idx));
+//   for (int i = 0; i < node->inputs->size - first_tensor_idx; i++) {
+//     const TfLiteEvalTensor* input =
+//         tflite::micro::GetEvalInput(context, node, i + first_tensor_idx);
+//     TfLiteEvalTensor* subgraph_input =
+//         graph_info->GetSubgraphInput(subgraph_idx, i);
+//     int bytes = ValidateAndGetTensorSizes(input, subgraph_input);
+//     TF_LITE_ENSURE(context, bytes >= 0);
+//     memcpy(subgraph_input->data.raw, input->data.raw, bytes);
+//   }
+//   return kTfLiteOk;
+// }
 
-TfLiteStatus CopyOpOutputsToSubgraphInputs(TfLiteContext* context,
-                                           TfLiteNode* node,
-                                           MicroGraph* graph_info,
-                                           int subgraph_idx) {
-  TF_LITE_ENSURE(context, static_cast<size_t>(node->outputs->size) ==
-                              graph_info->NumSubgraphInputs(subgraph_idx));
-  for (int i = 0; i < node->outputs->size; i++) {
-    TfLiteEvalTensor* output = tflite::micro::GetEvalOutput(context, node, i);
-    TfLiteEvalTensor* subgraph_input =
-        graph_info->GetSubgraphInput(subgraph_idx, i);
-    int bytes = ValidateAndGetTensorSizes(output, subgraph_input);
-    TF_LITE_ENSURE(context, bytes >= 0);
-    memcpy(subgraph_input->data.raw, output->data.raw, bytes);
-  }
-  return kTfLiteOk;
-}
+// TfLiteStatus CopyOpOutputsToSubgraphInputs(TfLiteContext* context,
+//                                            TfLiteNode* node,
+//                                            MicroGraph* graph_info,
+//                                            int subgraph_idx) {
+//   TF_LITE_ENSURE(context, static_cast<size_t>(node->outputs->size) ==
+//                               graph_info->NumSubgraphInputs(subgraph_idx));
+//   for (int i = 0; i < node->outputs->size; i++) {
+//     TfLiteEvalTensor* output = tflite::micro::GetEvalOutput(context, node, i);
+//     TfLiteEvalTensor* subgraph_input =
+//         graph_info->GetSubgraphInput(subgraph_idx, i);
+//     int bytes = ValidateAndGetTensorSizes(output, subgraph_input);
+//     TF_LITE_ENSURE(context, bytes >= 0);
+//     memcpy(subgraph_input->data.raw, output->data.raw, bytes);
+//   }
+//   return kTfLiteOk;
+// }
 
-TfLiteStatus CopySubgraphOutputsToOpOutputs(TfLiteContext* context,
-                                            TfLiteNode* node,
-                                            MicroGraph* graph_info,
-                                            int subgraph_idx) {
-  TF_LITE_ENSURE(context, static_cast<size_t>(node->outputs->size) ==
-                              graph_info->NumSubgraphOutputs(subgraph_idx));
-  for (int i = 0; i < node->outputs->size; i++) {
-    TfLiteEvalTensor* output = tflite::micro::GetEvalOutput(context, node, i);
-    TfLiteEvalTensor* subgraph_output =
-        graph_info->GetSubgraphOutput(subgraph_idx, i);
-    int bytes = ValidateAndGetTensorSizes(output, subgraph_output);
-    TF_LITE_ENSURE(context, bytes >= 0);
-    memcpy(output->data.raw, subgraph_output->data.raw, bytes);
-  }
-  return kTfLiteOk;
-}
+// TfLiteStatus CopySubgraphOutputsToOpOutputs(TfLiteContext* context,
+//                                             TfLiteNode* node,
+//                                             MicroGraph* graph_info,
+//                                             int subgraph_idx) {
+//   TF_LITE_ENSURE(context, static_cast<size_t>(node->outputs->size) ==
+//                               graph_info->NumSubgraphOutputs(subgraph_idx));
+//   for (int i = 0; i < node->outputs->size; i++) {
+//     TfLiteEvalTensor* output = tflite::micro::GetEvalOutput(context, node, i);
+//     TfLiteEvalTensor* subgraph_output =
+//         graph_info->GetSubgraphOutput(subgraph_idx, i);
+//     int bytes = ValidateAndGetTensorSizes(output, subgraph_output);
+//     TF_LITE_ENSURE(context, bytes >= 0);
+//     memcpy(output->data.raw, subgraph_output->data.raw, bytes);
+//   }
+//   return kTfLiteOk;
+// }
 
-TfLiteEvalTensor MakeUnpackedInt4Tensor(TfLiteContext* context,
-                                        int scratch_buffer_index,
-                                        const TfLiteEvalTensor* tensor) {
-  if (tensor->type != kTfLiteInt4) {
-    return *tensor;
-  }
+// TfLiteEvalTensor MakeUnpackedInt4Tensor(TfLiteContext* context,
+//                                         int scratch_buffer_index,
+//                                         const TfLiteEvalTensor* tensor) {
+//   if (tensor->type != kTfLiteInt4) {
+//     return *tensor;
+//   }
 
-  TfLiteEvalTensor new_tensor;
-  new_tensor.data.data = static_cast<int8_t*>(
-      context->GetScratchBuffer(context, scratch_buffer_index));
-  new_tensor.dims = tensor->dims;
-  new_tensor.type = kTfLiteInt8;
-  tflite::tensor_utils::UnpackDenseInt4IntoInt8(
-      tflite::micro::GetTensorData<int8_t>(tensor),
-      tflite::micro::GetTensorShape(tensor).FlatSize(),
-      tflite::micro::GetTensorData<int8_t>(&new_tensor));
-  return new_tensor;
-}
+//   TfLiteEvalTensor new_tensor;
+//   new_tensor.data.data = static_cast<int8_t*>(
+//       context->GetScratchBuffer(context, scratch_buffer_index));
+//   new_tensor.dims = tensor->dims;
+//   new_tensor.type = kTfLiteInt8;
+//   tflite::tensor_utils::UnpackDenseInt4IntoInt8(
+//       tflite::micro::GetTensorData<int8_t>(tensor),
+//       tflite::micro::GetTensorShape(tensor).FlatSize(),
+//       tflite::micro::GetTensorData<int8_t>(&new_tensor));
+//   return new_tensor;
+// }
 
 }  // namespace micro
 }  // namespace tflite

@@ -17,7 +17,8 @@ limitations under the License.
 #define TENSORFLOW_LITE_MICRO_MICRO_CONTEXT_H_
 
 #include "tensorflow/lite/core/c/common.h"
-#include "tensorflow/lite/micro/micro_graph.h"
+#include "tensorflow/lite/micro/compatibility.h"
+// #include "tensorflow/lite/micro/micro_graph.h"
 
 namespace tflite {
 // TODO(b/149795762): kTfLiteAbort cannot be part of the tflite TfLiteStatus.
@@ -93,7 +94,7 @@ class MicroContext {
 
   virtual void* external_context() = 0;
 
-  virtual MicroGraph& graph() = 0;
+  // virtual MicroGraph& graph() = 0;
 
  private:
   TF_LITE_REMOVE_VIRTUAL_DELETE

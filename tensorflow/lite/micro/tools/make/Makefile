@@ -25,10 +25,10 @@ BUILD_TYPE := release_with_logs
 IS_BUILD_DYNAMIC := 0
 # 是否编译测试代码
 IS_BUILD_TEST := 1
-# 是否编译signal模块
-IS_BUILD_SIGNAL := 1
-# kiss fft
-IS_BUILD_KISS_FFT := 1
+# # 是否编译signal模块
+# IS_BUILD_SIGNAL := 0
+# # kiss fft
+# IS_BUILD_KISS_FFT := 0
 
 # root directory of tensorflow
 TENSORFLOW_ROOT :=
@@ -183,24 +183,6 @@ else ifeq ($(BUILD_TYPE), release_with_logs)
 	# for profiling and benchmarking.
 	CXXFLAGS += -DNDEBUG
 	CCFLAGS  += -DNDEBUG
-else ifeq ($(BUILD_TYPE), no_tf_lite_static_memory)
-	# TODO(b/287320282): remove the no_tf_lite_static_memory build.
-	#
-	# This build should not be used to run any binaries/tests since
-	# TF_LITE_STATIC_MEMORY should be defined for all micro builds. However,
-	# having a build without TF_LITE_STATIC_MEMORY is useful to catch errors in
-	# code that is shared between TfLite Mobile and TfLite Micro. See this issue
-	# for more details:
-	# https://github.com/tensorflow/tensorflow/issues/43076
-	CXXFLAGS := $(filter-out -DTF_LITE_STATIC_MEMORY, $(CXXFLAGS))
-	CCFLAGS := $(filter-out -DTF_LITE_STATIC_MEMORY, $(CCFLAGS))
-
-	# We are using C++17 for the no_tf_lite_static_memory_build to make it close
-	# to the TfLite bazel build.
-	CXXFLAGS := $(filter-out -std=c++11, $(CXXFLAGS))
-	CXXFLAGS += -std=c++17
-	CCFLAGS := $(filter-out -std=c11, $(CCLAGS))
-	CCFLAGS += -std=c17
 endif
 
 # This library is the main target for this makefile. It will contain a minimal
@@ -232,16 +214,12 @@ $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/add.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/add_common.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/add_n.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/arg_min_max.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/assign_variable.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/batch_matmul.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/batch_to_space_nd.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/broadcast_args.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/broadcast_to.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/call_once.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/cast.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/ceil.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/circular_buffer.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/circular_buffer_common.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/comparisons.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/concatenation.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/conv.cc \
@@ -252,12 +230,9 @@ $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/depthwise_conv.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/depthwise_conv_common.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/dequantize.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/dequantize_common.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/detection_postprocess.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/div.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/elementwise.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/elu.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/embedding_lookup.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/ethosu.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/exp.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/expand_dims.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/fill.cc \
@@ -270,8 +245,6 @@ $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/gather.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/gather_nd.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/hard_swish.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/hard_swish_common.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/if.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/kernel_runner.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/kernel_util.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/l2norm.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/l2_pool_2d.cc \
@@ -298,7 +271,6 @@ $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/prelu.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/prelu_common.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/quantize.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/quantize_common.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/read_variable.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/reduce.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/reduce_common.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/reshape.cc \
@@ -328,8 +300,6 @@ $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/transpose.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/transpose_conv.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/unidirectional_sequence_lstm.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/unpack.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/var_handle.cc \
-$(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/while.cc \
 $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/zeros_like.cc
 
 # The explicitly specified list of sources and headers that are shared between
@@ -357,53 +327,22 @@ $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/memory_planner/*.cc) \
 $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tflite_bridge/*.cc) \
 $(TFL_CC_SRCS)
 
-ifneq ($(IS_BUILD_TEST), 1)
-  EXCLUDED_MICROLITE_CC_SRCS := \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/memory_planner/non_persistent_buffer_planner_shim.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/arena_allocator/recording_single_arena_buffer_allocator.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/fake_micro_context.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/mock_micro_graph.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/micro_profiler.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/recording_micro_allocator.cc \
-    $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc \
-  	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc
+# ifneq ($(IS_BUILD_TEST), 1)
+#   EXCLUDED_MICROLITE_CC_SRCS := \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/arena_allocator/recording_single_arena_buffer_allocator.cc \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/fake_micro_context.cc \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/mock_micro_graph.cc \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/micro_profiler.cc \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/recording_micro_allocator.cc \
+#     $(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helper_custom_ops.cc \
+#   	$(TENSORFLOW_ROOT)tensorflow/lite/micro/test_helpers.cc
 
-  MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
-endif
+#   MICROLITE_CC_SRCS := $(filter-out $(EXCLUDED_MICROLITE_CC_SRCS), $(MICROLITE_CC_SRCS))
+# endif
 
 # TODO(b/165940489): Figure out how to avoid including fixed point
 # platform-specific headers.
 THIRD_PARTY_CC_HDRS := \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/allocator.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/array.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/base.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/buffer.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/buffer_ref.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/code_generator.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/code_generators.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/default_allocator.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/detached_buffer.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/file_manager.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flatbuffer_builder.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flatbuffers.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flex_flat_util.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/flexbuffers.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/grpc.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/hash.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/idl.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/minireflect.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/reflection.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/reflection_generated.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/registry.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/stl_emulation.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/string.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/struct.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/table.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/util.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/vector.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/vector_downward.h \
-$(3RDPARTY_DIR)/flatbuffers/include/flatbuffers/verifier.h \
-$(3RDPARTY_DIR)/flatbuffers/LICENSE \
 $(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint.h \
 $(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint_neon.h \
 $(3RDPARTY_DIR)/gemmlowp/fixedpoint/fixedpoint_sse.h \
@@ -418,75 +357,6 @@ TARGETS_WITHOUT_MAKEFILES := $(HOST_OS)
 # This specific string needs to be outputted for a test to be recognized as
 # having passed.
 TEST_PASS_STRING:='~~~ALL TESTS PASSED~~~'
-
-ifeq ($(IS_BUILD_KISS_FFT), 1)
-  INCLUDES += -I$(3RDPARTY_DIR)/kissfft
-
-  # some kiss fft source file has to be included in header sections because
-  # the implemenation of three different resolution fft from one single c file.
-  # See http://b/201319430 for additional context.
-  THIRD_PARTY_CC_HDRS += \
-  $(3RDPARTY_DIR)/kissfft/COPYING \
-  $(3RDPARTY_DIR)/kissfft/kiss_fft.c \
-  $(3RDPARTY_DIR)/kissfft/kiss_fft.h \
-  $(3RDPARTY_DIR)/kissfft/_kiss_fft_guts.h \
-  $(3RDPARTY_DIR)/kissfft/tools/kiss_fftr.c \
-  $(3RDPARTY_DIR)/kissfft/tools/kiss_fftr.h \
-
-  # Load custom kernels.
-  MICROLITE_CC_KERNEL_SRCS += \
-  $(TENSORFLOW_ROOT)signal/src/kiss_fft_wrappers/kiss_fft_float.cc \
-  $(TENSORFLOW_ROOT)signal/src/kiss_fft_wrappers/kiss_fft_int16.cc \
-  $(TENSORFLOW_ROOT)signal/src/kiss_fft_wrappers/kiss_fft_int32.cc
-
-#   MICROLITE_CC_HDRS += \
-#   $(wildcard $(TENSORFLOW_ROOT)signal/src/kiss_fft_wrappers/*.h) \
-
-endif
-
-ifeq ($(IS_BUILD_SIGNAL), 1)
-  MICROLITE_CC_SIGNAL_KERNEL_SRCS := \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/delay.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/energy.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/fft_auto_scale_kernel.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/fft_auto_scale_common.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/filter_bank.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/filter_bank_log.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/filter_bank_square_root.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/filter_bank_square_root_common.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/filter_bank_spectral_subtraction.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/framer.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/irfft.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/rfft.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/stacker.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/overlap_add.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/pcan.cc \
-  $(TENSORFLOW_ROOT)signal/micro/kernels/window.cc \
-  $(TENSORFLOW_ROOT)signal/src/circular_buffer.cc \
-  $(TENSORFLOW_ROOT)signal/src/energy.cc \
-  $(TENSORFLOW_ROOT)signal/src/fft_auto_scale.cc \
-  $(TENSORFLOW_ROOT)signal/src/filter_bank.cc \
-  $(TENSORFLOW_ROOT)signal/src/filter_bank_log.cc \
-  $(TENSORFLOW_ROOT)signal/src/filter_bank_square_root.cc \
-  $(TENSORFLOW_ROOT)signal/src/filter_bank_spectral_subtraction.cc \
-  $(TENSORFLOW_ROOT)signal/src/irfft_float.cc \
-  $(TENSORFLOW_ROOT)signal/src/irfft_int16.cc \
-  $(TENSORFLOW_ROOT)signal/src/irfft_int32.cc \
-  $(TENSORFLOW_ROOT)signal/src/log.cc \
-  $(TENSORFLOW_ROOT)signal/src/max_abs.cc \
-  $(TENSORFLOW_ROOT)signal/src/msb_32.cc \
-  $(TENSORFLOW_ROOT)signal/src/msb_64.cc \
-  $(TENSORFLOW_ROOT)signal/src/overlap_add.cc \
-  $(TENSORFLOW_ROOT)signal/src/pcan_argc_fixed.cc \
-  $(TENSORFLOW_ROOT)signal/src/rfft_float.cc \
-  $(TENSORFLOW_ROOT)signal/src/rfft_int16.cc \
-  $(TENSORFLOW_ROOT)signal/src/rfft_int32.cc \
-  $(TENSORFLOW_ROOT)signal/src/square_root_32.cc \
-  $(TENSORFLOW_ROOT)signal/src/square_root_64.cc \
-  $(TENSORFLOW_ROOT)signal/src/window.cc
-
-  MICROLITE_CC_KERNEL_SRCS += $(MICROLITE_CC_SIGNAL_KERNEL_SRCS)
-endif
 
 ALL_SRCS := \
 	$(MICROLITE_CC_SRCS) \
@@ -559,15 +429,15 @@ ifeq ($(IS_BUILD_TEST), 1)
 
   MICRO_LITE_EXAMPLE_TESTS := $(shell find $(TENSORFLOW_ROOT)tensorflow/lite/micro/examples/ -maxdepth 2 -name Makefile.inc)
 
-  MICRO_LITE_BENCHMARKS := $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/benchmarking/Makefile.inc)
+  # MICRO_LITE_BENCHMARKS := $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/benchmarking/Makefile.inc)
 
-  MICRO_LITE_LAYER_BY_LAYER_OUTPUT := $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/Makefile.inc)
+  # MICRO_LITE_LAYER_BY_LAYER_OUTPUT := $(wildcard $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/Makefile.inc)
 
   # Load the examples.
   include $(MICRO_LITE_EXAMPLE_TESTS)
 
   # Load the benchmarks.
-  include $(MICRO_LITE_BENCHMARKS)
+  # include $(MICRO_LITE_BENCHMARKS)
 
   $(BINDIR)%_test : $(CORE_OBJDIR)%_test.o $(MICROLITE_LIB_PATH)
 	@mkdir -p $(dir $@)
@@ -575,8 +445,8 @@ ifeq ($(IS_BUILD_TEST), 1)
 	-o $@ $< \
 	$(MICROLITE_LIB_PATH) $(LDFLAGS) $(MICROLITE_LIBS)
 
-  # Create kernel test targets.
-  include $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/Makefile.inc
+  # # Create kernel test targets.
+  # include $(TENSORFLOW_ROOT)tensorflow/lite/micro/kernels/Makefile.inc
 
   # Just build the test targets
   build: $(MICROLITE_BUILD_TARGETS)

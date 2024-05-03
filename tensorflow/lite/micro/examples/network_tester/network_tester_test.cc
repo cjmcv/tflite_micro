@@ -97,7 +97,7 @@ TF_LITE_MICRO_TEST(TestInvoke) {
   resolver.AddAveragePool2D(tflite::Register_AVERAGE_POOL_2D_INT8());
   resolver.AddConv2D(tflite::Register_CONV_2D_INT8());
   resolver.AddDepthwiseConv2D(tflite::Register_DEPTHWISE_CONV_2D_INT8());
-  resolver.AddEthosU();
+  // resolver.AddEthosU();
   resolver.AddReshape();
   resolver.AddSoftmax(tflite::Register_SOFTMAX_INT8());
 

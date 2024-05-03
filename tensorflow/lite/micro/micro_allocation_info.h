@@ -17,9 +17,9 @@ limitations under the License.
 
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/compatibility.h"
-#include "tensorflow/lite/micro/flatbuffer_utils.h"
+// #include "tensorflow/lite/micro/flatbuffer_utils.h"
 #include "tensorflow/lite/micro/micro_allocator.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+// #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 
@@ -55,83 +55,83 @@ struct GraphAllocationInfo {
   size_t scratch_buffer_count;
 };
 
-// A helper class to construct AllocationInfo array. This array contains the
-// lifetime of tensors / scratch_buffer and will be used to calculate the memory
-// plan. Methods need to be called in order from `Create`, Init`, `Add*`, to
-// `Finish`.
-class AllocationInfoBuilder {
- public:
-  AllocationInfoBuilder(const Model* model,
-                        INonPersistentBufferAllocator* non_persistent_allocator)
-      : model_(model), non_persistent_allocator_(non_persistent_allocator) {}
+// // A helper class to construct AllocationInfo array. This array contains the
+// // lifetime of tensors / scratch_buffer and will be used to calculate the memory
+// // plan. Methods need to be called in order from `Create`, Init`, `Add*`, to
+// // `Finish`.
+// class AllocationInfoBuilder {
+//  public:
+//   AllocationInfoBuilder(const Model* model,
+//                         INonPersistentBufferAllocator* non_persistent_allocator)
+//       : model_(model), non_persistent_allocator_(non_persistent_allocator) {}
 
-  // Check if model contains offline planned buffer offsets.
-  //  - If there's no metadata available, offline_planner_offsets is not set
-  //  - If there's metadata available, offline_planner_offsets will point to the
-  //    first offset in the metadata buffer list.
-  TfLiteStatus GetOfflinePlannedOffsets(
-      const int32_t** offline_planner_offsets);
+//   // Check if model contains offline planned buffer offsets.
+//   //  - If there's no metadata available, offline_planner_offsets is not set
+//   //  - If there's metadata available, offline_planner_offsets will point to the
+//   //    first offset in the metadata buffer list.
+//   TfLiteStatus GetOfflinePlannedOffsets(
+//       const int32_t** offline_planner_offsets);
 
-  // Allocate memory for the allocation info array as well as offsets into that
-  // array for each subgraph.
-  TfLiteStatus CreateAllocationInfo(int scratch_buffer_request_count);
+//   // Allocate memory for the allocation info array as well as offsets into that
+//   // array for each subgraph.
+//   TfLiteStatus CreateAllocationInfo(int scratch_buffer_request_count);
 
-  // Release memory used for the allocation info array.
-  TfLiteStatus FreeAllocationInfo();
+//   // Release memory used for the allocation info array.
+//   TfLiteStatus FreeAllocationInfo();
 
-  // Initialize AllocationInfo for all tensors and scratch buffers in the graph.
-  TfLiteStatus InitializeAllocationInfo(const int32_t* offline_offsets,
-                                        SubgraphAllocations* allocations);
+//   // // Initialize AllocationInfo for all tensors and scratch buffers in the graph.
+//   // TfLiteStatus InitializeAllocationInfo(const int32_t* offline_offsets,
+//   //                                       SubgraphAllocations* allocations);
 
-  // Mark the scope of each tensor and scratch buffer across the graph. Enter
-  // all possible subgraphs invoked by each control flow operator. This method
-  // marks the maximum lifetime of each buffer so that tensors are correctly
-  // planned for all valid invocation flows.
-  TfLiteStatus MarkAllocationLifetimes(
-      int subgraph_idx, internal::ScratchBufferRequest* scratch_buffer_request,
-      ScratchBufferHandle* scratch_buffer_handles,
-      SubgraphAllocations* allocations);
+//   // // Mark the scope of each tensor and scratch buffer across the graph. Enter
+//   // // all possible subgraphs invoked by each control flow operator. This method
+//   // // marks the maximum lifetime of each buffer so that tensors are correctly
+//   // // planned for all valid invocation flows.
+//   // TfLiteStatus MarkAllocationLifetimes(
+//   //     int subgraph_idx, internal::ScratchBufferRequest* scratch_buffer_request,
+//   //     ScratchBufferHandle* scratch_buffer_handles,
+//   //     SubgraphAllocations* allocations);
 
-  // Identify control flow operators and recursively mark all subgraphs which
-  // that operator can invoke. The lifetime of all tensors within a subgraph
-  // can only be extended. The order of subgraph invocation does not matter
-  // since subgraphs within the same control flow operator are executed
-  // within their own allocation scope (planned buffers in a subgraph cannot
-  // persist beyond the end of that subgraph's invocation).
-  TfLiteStatus MarkSubgraphLifetimesIfNecessary(
-      const Operator* op,
-      internal::ScratchBufferRequest* scratch_buffer_requests,
-      ScratchBufferHandle* scratch_buffer_handles,
-      SubgraphAllocations* allocations);
+//   // Identify control flow operators and recursively mark all subgraphs which
+//   // that operator can invoke. The lifetime of all tensors within a subgraph
+//   // can only be extended. The order of subgraph invocation does not matter
+//   // since subgraphs within the same control flow operator are executed
+//   // within their own allocation scope (planned buffers in a subgraph cannot
+//   // persist beyond the end of that subgraph's invocation).
+//   // TfLiteStatus MarkSubgraphLifetimesIfNecessary(
+//   //     const Operator* op,
+//   //     internal::ScratchBufferRequest* scratch_buffer_requests,
+//   //     ScratchBufferHandle* scratch_buffer_handles,
+//   //     SubgraphAllocations* allocations);
 
-  // Returns the number of allocations.
-  int AllocationCount() const { return info_.allocation_info_count; }
+//   // Returns the number of allocations.
+//   int AllocationCount() const { return info_.allocation_info_count; }
 
-  // Returns a pointer to the built AllocationInfo array.
-  AllocationInfo* Finish() const { return info_.allocation_info; }
+//   // Returns a pointer to the built AllocationInfo array.
+//   AllocationInfo* Finish() const { return info_.allocation_info; }
 
- private:
-  // Mark the given Allocation info as first created at the specified allocation
-  // scope count. Only the first creation must be recorded since the allocation
-  // scope count monotonically increases throughout the lifetime marking
-  // process.
-  void UpdateFirstCreated(AllocationInfo* current, int allocation_scope_count);
+//  private:
+//   // Mark the given Allocation info as first created at the specified allocation
+//   // scope count. Only the first creation must be recorded since the allocation
+//   // scope count monotonically increases throughout the lifetime marking
+//   // process.
+//   void UpdateFirstCreated(AllocationInfo* current, int allocation_scope_count);
 
-  // Mark the given AllocationInfo as last used at the specified allocation
-  // scope
-  // count. Update the last used marker every time, since the allocation scope
-  // count monotonically increases through the lifetime marking process.
-  void UpdateLastUsed(AllocationInfo* current, int allocation_scope_count);
+//   // Mark the given AllocationInfo as last used at the specified allocation
+//   // scope
+//   // count. Update the last used marker every time, since the allocation scope
+//   // count monotonically increases through the lifetime marking process.
+//   void UpdateLastUsed(AllocationInfo* current, int allocation_scope_count);
 
-  // Validate if a subgraph satisfies assumptions.
-  TfLiteStatus ValidateSubgraph(const SubGraph* subgraph,
-                                TfLiteEvalTensor* eval_tensors);
+//   // // Validate if a subgraph satisfies assumptions.
+//   // TfLiteStatus ValidateSubgraph(const SubGraph* subgraph,
+//   //                               TfLiteEvalTensor* eval_tensors);
 
-  const tflite::Model* model_ = nullptr;
-  INonPersistentBufferAllocator* non_persistent_allocator_ = nullptr;
-  GraphAllocationInfo info_;
-  int allocation_scope_count_ = 0;
-};
+//   const tflite::Model* model_ = nullptr;
+//   INonPersistentBufferAllocator* non_persistent_allocator_ = nullptr;
+//   GraphAllocationInfo info_;
+//   int allocation_scope_count_ = 0;
+// };
 
 }  // namespace tflite
 

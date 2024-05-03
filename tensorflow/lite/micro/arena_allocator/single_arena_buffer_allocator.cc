@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <cstddef>
 #include <cstdint>
+#include <algorithm>
 #include <new>
 
 #include "tensorflow/lite/core/c/c_api_types.h"

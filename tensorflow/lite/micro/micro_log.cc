@@ -18,12 +18,22 @@ limitations under the License.
 #include <cstdarg>
 #include <cstdint>
 
-#if !defined(TF_LITE_STRIP_ERROR_STRINGS)
-#include "tensorflow/lite/micro/debug_log.h"
-#endif
+// #if !defined(TF_LITE_STRIP_ERROR_STRINGS)
+// #include "tensorflow/lite/micro/debug_log.h"
+// #endif
 
 #if !defined(TF_LITE_STRIP_ERROR_STRINGS)
+#include <cstdio>
 namespace {
+
+void DebugLog(const char* format, va_list args) {
+#ifndef TF_LITE_STRIP_ERROR_STRINGS
+  // Reusing TF_LITE_STRIP_ERROR_STRINGS to disable DebugLog completely to get
+  // maximum reduction in binary size. This is because we have DebugLog calls
+  // via TF_LITE_CHECK that are not stubbed out by TF_LITE_REPORT_ERROR.
+  vfprintf(stderr, format, args);
+#endif
+}
 
 void VDebugLog(const char* format, ...) {
   va_list args;
@@ -47,16 +57,16 @@ void MicroPrintf(const char* format, ...) {
   va_end(args);
 }
 
-int MicroSnprintf(char* buffer, size_t buf_size, const char* format, ...) {
-  va_list args;
-  va_start(args, format);
-  int result = MicroVsnprintf(buffer, buf_size, format, args);
-  va_end(args);
-  return result;
-}
+// int MicroSnprintf(char* buffer, size_t buf_size, const char* format, ...) {
+//   va_list args;
+//   va_start(args, format);
+//   int result = MicroVsnprintf(buffer, buf_size, format, args);
+//   va_end(args);
+//   return result;
+// }
 
-int MicroVsnprintf(char* buffer, size_t buf_size, const char* format,
-                   va_list vlist) {
-  return DebugVsnprintf(buffer, buf_size, format, vlist);
-}
+// int MicroVsnprintf(char* buffer, size_t buf_size, const char* format,
+//                    va_list vlist) {
+//   return DebugVsnprintf(buffer, buf_size, format, vlist);
+// }
 #endif  // !defined(TF_LITE_STRIP_ERROR_STRINGS)

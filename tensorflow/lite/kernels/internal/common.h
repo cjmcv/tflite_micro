@@ -30,7 +30,7 @@ limitations under the License.
 #include <functional>
 
 #include "fixedpoint/fixedpoint.h"
-#include "tensorflow/lite/core/macros.h"
+// #include "tensorflow/lite/core/macros.h"
 #include "tensorflow/lite/kernels/internal/cppmath.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 
@@ -224,10 +224,10 @@ inline int32_t MultiplyByQuantizedMultiplierGreaterThanOne(
                                            quantized_multiplier);
 }
 
-TFLITE_NOINLINE int32_t MultiplyByQuantizedMultiplier(
+int32_t MultiplyByQuantizedMultiplier(
     int32_t x, int32_t quantized_multiplier, int shift);
 
-TFLITE_NOINLINE int32_t MultiplyByQuantizedMultiplier(
+int32_t MultiplyByQuantizedMultiplier(
     int64_t x, int32_t quantized_multiplier, int shift);
 
 template <typename T>
@@ -946,7 +946,7 @@ inline void NdArrayDescsForElementwiseBroadcast(const Dims<N>& input0_dims,
 
 // Copies dims to desc, calculating strides.
 template <int N>
-TFLITE_NOINLINE void CopyDimsToDesc(const RuntimeShape& input_shape,
+void CopyDimsToDesc(const RuntimeShape& input_shape,
                                     NdArrayDesc<N>* desc_out) {
   int desc_stride = 1;
   for (int i = N - 1; i >= 0; --i) {

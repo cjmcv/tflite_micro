@@ -24,6 +24,7 @@ limitations under the License.
 #include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
 #include "tensorflow/lite/kernels/internal/types.h"
 #include "tensorflow/lite/micro/micro_context.h"
+#include "tensorflow/lite/micro/micro_common.h"
 
 namespace tflite {
 namespace micro {
@@ -112,38 +113,38 @@ TfLiteStatus CreateWritableTensorDimsWithCopy(TfLiteContext* context,
 // shapes and types to be identical to op output tensor shapes and types.
 TfLiteStatus CopyOpInputsToOpOutputs(TfLiteContext* context, TfLiteNode* node);
 
-// Copy all op input tensors to subgraph input tensors. Requires all op input
-// tensor shapes and types to be identical to subgraph input tensor shapes and
-// types.
-TfLiteStatus CopyOpInputsToSubgraphInputs(TfLiteContext* context,
-                                          TfLiteNode* node,
-                                          MicroGraph* graph_info,
-                                          int subgraph_idx,
-                                          int first_tensor_idx);
+// // Copy all op input tensors to subgraph input tensors. Requires all op input
+// // tensor shapes and types to be identical to subgraph input tensor shapes and
+// // types.
+// TfLiteStatus CopyOpInputsToSubgraphInputs(TfLiteContext* context,
+//                                           TfLiteNode* node,
+//                                           MicroGraph* graph_info,
+//                                           int subgraph_idx,
+//                                           int first_tensor_idx);
 
-// Copy all op output tensors to subgraph input tensors. Requires all op output
-// tensor shapes and types to be identical to subgraph input tensor shapes and
-// types.
-TfLiteStatus CopyOpOutputsToSubgraphInputs(TfLiteContext* context,
-                                           TfLiteNode* node,
-                                           MicroGraph* graph_info,
-                                           int subgraph_idx);
+// // Copy all op output tensors to subgraph input tensors. Requires all op output
+// // tensor shapes and types to be identical to subgraph input tensor shapes and
+// // types.
+// TfLiteStatus CopyOpOutputsToSubgraphInputs(TfLiteContext* context,
+//                                            TfLiteNode* node,
+//                                            MicroGraph* graph_info,
+//                                            int subgraph_idx);
 
-// Copy all subgraph output tensors to op outputs. Requires all subgraph output
-// tensor shapes and types to be identical to op output tensor shapes and types.
-TfLiteStatus CopySubgraphOutputsToOpOutputs(TfLiteContext* context,
-                                            TfLiteNode* node,
-                                            MicroGraph* graph_info,
-                                            int subgraph_idx);
+// // Copy all subgraph output tensors to op outputs. Requires all subgraph output
+// // tensor shapes and types to be identical to op output tensor shapes and types.
+// TfLiteStatus CopySubgraphOutputsToOpOutputs(TfLiteContext* context,
+//                                             TfLiteNode* node,
+//                                             MicroGraph* graph_info,
+//                                             int subgraph_idx);
 
-// If tensor is INT4, make a new TfLiteEvalTensor with data unpacked into
-// a scratch buffer. The returned tensor will have the kTfLiteInt8 type.
-// Assume scratch buffer is previously requested in Prepare, and
-// scratch_buffer_index can be used to retrieve that buffer.
-// If the tensor is not INT4, a shallow copy is returned.
-TfLiteEvalTensor MakeUnpackedInt4Tensor(TfLiteContext* context,
-                                        int scratch_buffer_index,
-                                        const TfLiteEvalTensor* tensor);
+// // If tensor is INT4, make a new TfLiteEvalTensor with data unpacked into
+// // a scratch buffer. The returned tensor will have the kTfLiteInt8 type.
+// // Assume scratch buffer is previously requested in Prepare, and
+// // scratch_buffer_index can be used to retrieve that buffer.
+// // If the tensor is not INT4, a shallow copy is returned.
+// TfLiteEvalTensor MakeUnpackedInt4Tensor(TfLiteContext* context,
+//                                         int scratch_buffer_index,
+//                                         const TfLiteEvalTensor* tensor);
 }  // namespace micro
 }  // namespace tflite
 

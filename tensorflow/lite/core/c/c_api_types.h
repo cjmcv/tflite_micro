@@ -42,32 +42,6 @@ limitations under the License.
 extern "C" {
 #endif
 
-// clang-format off
-// NOLINTBEGIN(whitespace/line_length)
-/** \defgroup c_api_types lite/c/c_api_types.h
- *  @{
- */
-// NOLINTEND(whitespace/line_length)
-// clang-format on
-
-// Define TFL_CAPI_EXPORT macro to export a function properly with a shared
-// library.
-#ifdef SWIG
-#define TFL_CAPI_EXPORT
-#elif defined(TFL_STATIC_LIBRARY_BUILD)
-#define TFL_CAPI_EXPORT
-#else  // not definded TFL_STATIC_LIBRARY_BUILD
-#if defined(_WIN32)
-#ifdef TFL_COMPILE_LIBRARY
-#define TFL_CAPI_EXPORT __declspec(dllexport)
-#else
-#define TFL_CAPI_EXPORT __declspec(dllimport)
-#endif  // TFL_COMPILE_LIBRARY
-#else
-#define TFL_CAPI_EXPORT __attribute__((visibility("default")))
-#endif  // _WIN32
-#endif  // SWIG
-
 /// Note that new error status values may be added in future in order to
 /// indicate more fine-grained internal states, therefore, applications should
 /// not rely on status values being members of the enum.
@@ -145,45 +119,6 @@ typedef struct TfLiteQuantizationParams {
   int32_t zero_point;
 } TfLiteQuantizationParams;
 
-// --------------------------------------------------------------------------
-// Opaque types used by c_api.h, c_api_opaque.h and common.h.
-
-/// TfLiteOpaqueContext is an opaque version of TfLiteContext;
-typedef struct TfLiteOpaqueContext TfLiteOpaqueContext;
-
-/// TfLiteOpaqueNode is an opaque version of TfLiteNode;
-typedef struct TfLiteOpaqueNode TfLiteOpaqueNode;
-
-/// TfLiteOpaqueTensor is an opaque version of TfLiteTensor;
-typedef struct TfLiteOpaqueTensor TfLiteOpaqueTensor;
-
-/// TfLiteDelegate: allows delegation of nodes to alternative backends.
-/// Forward declaration of concrete type declared in common.h.
-typedef struct TfLiteDelegate TfLiteDelegate;
-
-/// TfLiteOpaqueDelegateStruct: unconditionally opaque version of
-/// TfLiteDelegate; allows delegation of nodes to alternative backends.
-///
-/// This is an abstract type that is intended to have the same
-/// role as TfLiteDelegate, but without exposing the implementation
-/// details of how delegates are implemented.
-///
-/// WARNING: This is an experimental type and subject to change.
-typedef struct TfLiteOpaqueDelegateStruct TfLiteOpaqueDelegateStruct;
-
-/// TfLiteOpaqueDelegate: conditionally opaque version of
-/// TfLiteDelegate; allows delegation of nodes to alternative backends.
-/// For TF Lite in Play Services, this is an opaque type,
-/// but for regular TF Lite, this is just a typedef for TfLiteDelegate.
-///
-/// WARNING: This is an experimental type and subject to change.
-#if TFLITE_WITH_STABLE_ABI || TFLITE_USE_OPAQUE_DELEGATE
-typedef TfLiteOpaqueDelegateStruct TfLiteOpaqueDelegate;
-#else
-typedef TfLiteDelegate TfLiteOpaqueDelegate;
-#endif
-
-/** @} */
 
 #ifdef __cplusplus
 }  // extern C

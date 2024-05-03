@@ -19,7 +19,7 @@ limitations under the License.
 #include <cstdint>
 
 #include "tensorflow/lite/core/c/common.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+// #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 
@@ -42,22 +42,22 @@ size_t AlignSizeUp(size_t count = 1) {
 // Returns size in bytes for a given TfLiteType.
 TfLiteStatus TfLiteTypeSizeOf(TfLiteType type, size_t* size);
 
-// How many bytes are needed to hold a tensor's contents.
-TfLiteStatus BytesRequiredForTensor(const tflite::Tensor& flatbuffer_tensor,
-                                    size_t* bytes, size_t* type_size);
+// // How many bytes are needed to hold a tensor's contents.
+// TfLiteStatus BytesRequiredForTensor(const tflite::Tensor& flatbuffer_tensor,
+//                                     size_t* bytes, size_t* type_size);
 
 // How many bytes are used in a TfLiteEvalTensor instance. The byte length is
 // returned in out_bytes.
 TfLiteStatus TfLiteEvalTensorByteLength(const TfLiteEvalTensor* eval_tensor,
                                         size_t* out_bytes);
 
-// Deduce output dimensions from input and allocate given size.
-// Useful for operators with two inputs where the largest input should equal the
-// output dimension.
-TfLiteStatus AllocateOutputDimensionsFromInput(TfLiteContext* context,
-                                               const TfLiteTensor* input1,
-                                               const TfLiteTensor* input2,
-                                               TfLiteTensor* output);
+// // Deduce output dimensions from input and allocate given size.
+// // Useful for operators with two inputs where the largest input should equal the
+// // output dimension.
+// TfLiteStatus AllocateOutputDimensionsFromInput(TfLiteContext* context,
+//                                                const TfLiteTensor* input1,
+//                                                const TfLiteTensor* input2,
+//                                                TfLiteTensor* output);
 
 }  // namespace tflite
 

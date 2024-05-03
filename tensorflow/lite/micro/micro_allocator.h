@@ -20,11 +20,11 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/arena_allocator/single_arena_buffer_allocator.h"
 #include "tensorflow/lite/micro/compatibility.h"
-#include "tensorflow/lite/micro/flatbuffer_utils.h"
+// #include "tensorflow/lite/micro/flatbuffer_utils.h"
 #include "tensorflow/lite/micro/memory_planner/micro_memory_planner.h"
 #include "tensorflow/lite/micro/micro_common.h"
-#include "tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+// #include "tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.h"
+// #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 
@@ -32,16 +32,16 @@ namespace tflite {
 // namespace.
 namespace internal {
 
-// Sets up all of the data structure members for a TfLiteTensor based on the
-// contents of a serialized tensor in the flatbuffer.
-// TODO(b/162311891): Drop this method when the interpreter has an API for
-// returning buffers on TfLiteEvalTensor.
-TfLiteStatus InitializeTfLiteTensorFromFlatbuffer(
-    IPersistentBufferAllocator* persistent_buffer_allocator,
-    INonPersistentBufferAllocator* non_persistent_buffer_allocator,
-    bool allocate_temp, const tflite::Tensor& flatbuffer_tensor,
-    const flatbuffers::Vector<flatbuffers::Offset<Buffer>>* buffers,
-    TfLiteTensor* result);
+// // Sets up all of the data structure members for a TfLiteTensor based on the
+// // contents of a serialized tensor in the flatbuffer.
+// // TODO(b/162311891): Drop this method when the interpreter has an API for
+// // returning buffers on TfLiteEvalTensor.
+// TfLiteStatus InitializeTfLiteTensorFromFlatbuffer(
+//     IPersistentBufferAllocator* persistent_buffer_allocator,
+//     INonPersistentBufferAllocator* non_persistent_buffer_allocator,
+//     bool allocate_temp, const tflite::Tensor& flatbuffer_tensor,
+//     const flatbuffers::Vector<flatbuffers::Offset<Buffer>>* buffers,
+//     TfLiteTensor* result);
 
 // Holds placeholder information for a scratch buffer request from a kernel.
 // This struct is only used during the model prepare stage. Each request from a
@@ -151,8 +151,8 @@ class MicroAllocator {
       uint8_t* non_persistent_tensor_arena, size_t non_persistent_arena_size,
       MemoryPlannerType memory_planner_type = MemoryPlannerType::kGreedy);
 
-  // Returns the fixed amount of memory overhead of MicroAllocator.
-  static size_t GetDefaultTailUsage(bool is_memory_planner_given);
+  // // Returns the fixed amount of memory overhead of MicroAllocator.
+  // static size_t GetDefaultTailUsage(bool is_memory_planner_given);
 
   // Returns True if the MicroAllocator uses a LinearMemoryPlanner(is compatible
   // with the PerserveAllTensors flag / feature ) and False otherwise.
@@ -169,7 +169,7 @@ class MicroAllocator {
   // pointer to an array of SubgraphAllocations (also stored in the tail of the
   // arena) where each index corresponds to a different subgraph in the model.
   // Return value is nullptr if the allocations failed.
-  SubgraphAllocations* StartModelAllocation(const Model* model);
+  // SubgraphAllocations* StartModelAllocation(const Model* model);
 
   // Finish allocating internal resources required for model inference.
   //
@@ -183,9 +183,9 @@ class MicroAllocator {
   // handles are stored in the out-param `scratch_buffer_handles` array which is
   // allocated in this method. This value will be used in `GetScratchBuffer`
   // call to retrieve scratch buffers.
-  TfLiteStatus FinishModelAllocation(
-      const Model* model, SubgraphAllocations* subgraph_allocations,
-      ScratchBufferHandle** scratch_buffer_handles);
+  // TfLiteStatus FinishModelAllocation(
+  //     const Model* model, SubgraphAllocations* subgraph_allocations,
+  //     ScratchBufferHandle** scratch_buffer_handles);
 
   // Allocates a TfLiteTensor struct and populates the returned value with
   // properties from the model flatbuffer. This struct is allocated from
@@ -193,9 +193,9 @@ class MicroAllocator {
   // application. The eval_tensors pointer should be the value passed into this
   // class during StartModelAllocation() and contains the source-of-truth for
   // buffers.
-  virtual TfLiteTensor* AllocatePersistentTfLiteTensor(
-      const Model* model, const SubgraphAllocations* subgraph_allocations,
-      int tensor_index, int subgraph_index);
+  // virtual TfLiteTensor* AllocatePersistentTfLiteTensor(
+  //     const Model* model, const SubgraphAllocations* subgraph_allocations,
+  //     int tensor_index, int subgraph_index);
 
   // Allocates a TfLiteTensor struct and populates the returned value with
   // properties from the model flatbuffer. This struct is allocated from
@@ -204,9 +204,9 @@ class MicroAllocator {
   // TfLiteEvalTensors. If the newly allocated temp at the specified subgraph
   // and tensor index is already present int the TfLiteEvalTensor array, its
   // data buffer will be re-used.
-  virtual TfLiteTensor* AllocateTempTfLiteTensor(
-      const Model* model, const SubgraphAllocations* subgraph_allocations,
-      int tensor_index, int subgraph_index);
+  // virtual TfLiteTensor* AllocateTempTfLiteTensor(
+  //     const Model* model, const SubgraphAllocations* subgraph_allocations,
+  //     int tensor_index, int subgraph_index);
 
   virtual void DeallocateTempTfLiteTensor(TfLiteTensor*);
 
@@ -248,7 +248,7 @@ class MicroAllocator {
   // `FinishModelAllocation`. Otherwise, it will return 0.
   size_t used_bytes() const;
 
-  TfLiteBridgeBuiltinDataAllocator* GetBuiltinDataAllocator();
+  // TfLiteBridgeBuiltinDataAllocator* GetBuiltinDataAllocator();
 
  protected:
   MicroAllocator(SingleArenaBufferAllocator* memory_allocator,
@@ -258,38 +258,38 @@ class MicroAllocator {
                  MicroMemoryPlanner* memory_planner);
   virtual ~MicroAllocator();
 
-  // Allocates an array in the arena to hold pointers to the node and
-  // registration pointers required to represent the inference graph of the
-  // model.
-  virtual TfLiteStatus AllocateNodeAndRegistrations(
-      const Model* model, SubgraphAllocations* subgraph_allocations);
+  // // Allocates an array in the arena to hold pointers to the node and
+  // // registration pointers required to represent the inference graph of the
+  // // model.
+  // virtual TfLiteStatus AllocateNodeAndRegistrations(
+  //     const Model* model, SubgraphAllocations* subgraph_allocations);
 
-  // Allocates the list of persistent TfLiteEvalTensors that are used for the
-  // "eval" phase of model inference. These structs will be the source of truth
-  // for all tensor buffers.
-  virtual TfLiteStatus AllocateTfLiteEvalTensors(
-      const Model* model, SubgraphAllocations* subgraph_allocations);
+  // // Allocates the list of persistent TfLiteEvalTensors that are used for the
+  // // "eval" phase of model inference. These structs will be the source of truth
+  // // for all tensor buffers.
+  // virtual TfLiteStatus AllocateTfLiteEvalTensors(
+  //     const Model* model, SubgraphAllocations* subgraph_allocations);
 
   // Allocates persistent tensor buffers for variable tensors in the subgraph.
   // Online and offline variable tensors are handled differently hence the
   // offline_planner_offsets parameter is needed.
-  virtual TfLiteStatus AllocateVariables(
-      const SubGraph* subgraph, TfLiteEvalTensor* eval_tensors,
-      const int32_t* offline_planner_offsets);
+  // virtual TfLiteStatus AllocateVariables(
+  //     const SubGraph* subgraph, TfLiteEvalTensor* eval_tensors,
+  //     const int32_t* offline_planner_offsets);
 
   // Allocate and return a persistent TfLiteTensor.
   // TODO(b/162311891): Drop this method when the interpreter has an API for
   // accessing TfLiteEvalTensor structs.
   virtual TfLiteTensor* AllocatePersistentTfLiteTensorInternal();
 
-  // Populates a TfLiteTensor struct with data from the model flatbuffer. Any
-  // quantization data is allocated from either the tail (persistent) or temp
-  // sections of the arena based on the allocation flag.
-  virtual TfLiteStatus PopulateTfLiteTensorFromFlatbuffer(const Model* model,
-                                                          TfLiteTensor* tensor,
-                                                          int tensor_index,
-                                                          int subgraph_idx,
-                                                          bool allocate_temp);
+  // // Populates a TfLiteTensor struct with data from the model flatbuffer. Any
+  // // quantization data is allocated from either the tail (persistent) or temp
+  // // sections of the arena based on the allocation flag.
+  // virtual TfLiteStatus PopulateTfLiteTensorFromFlatbuffer(const Model* model,
+  //                                                         TfLiteTensor* tensor,
+  //                                                         int tensor_index,
+  //                                                         int subgraph_idx,
+  //                                                         bool allocate_temp);
 
  private:
   // Commits a memory plan for all non-persistent buffer allocations in the
@@ -299,9 +299,9 @@ class MicroAllocator {
   // scratch_buffer_handles pointer is the array of pre-allocated
   // ScratchBufferHandle structs that will point to allocated buffers also in
   // the head section.
-  virtual TfLiteStatus CommitStaticMemoryPlan(
-      const Model* model, SubgraphAllocations* allocations,
-      ScratchBufferHandle* scratch_buffer_handles);
+  // virtual TfLiteStatus CommitStaticMemoryPlan(
+  //     const Model* model, SubgraphAllocations* allocations,
+  //     ScratchBufferHandle* scratch_buffer_handles);
 
   // Allocates an array of ScratchBufferHandle structs in the tail section for a
   // given number of handles.
@@ -322,7 +322,7 @@ class MicroAllocator {
   IPersistentBufferAllocator* persistent_buffer_allocator_;
 
   // Allocator used to allocate persistent builtin data.
-  TfLiteBridgeBuiltinDataAllocator* builtin_data_allocator_;
+  // TfLiteBridgeBuiltinDataAllocator* builtin_data_allocator_;
 
   // Activation buffer memory planner.
   MicroMemoryPlanner* memory_planner_;
