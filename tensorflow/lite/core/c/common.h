@@ -71,34 +71,12 @@ extern "C" {
 // NOLINTEND(whitespace/line_length)
 // clang-format on
 
-/// The list of external context types known to TF Lite. This list exists solely
-/// to avoid conflicts and to ensure ops can share the external contexts they
-/// need. Access to the external contexts is controlled by one of the
-/// corresponding support files.
-typedef enum TfLiteExternalContextType {
-  kTfLiteEigenContext = 0,       /// include eigen_support.h to use.
-  kTfLiteGemmLowpContext = 1,    /// include gemm_support.h to use.
-  kTfLiteEdgeTpuContext = 2,     /// Placeholder for Edge TPU support.
-  kTfLiteCpuBackendContext = 3,  /// include cpu_backend_context.h to use.
-  kTfLiteMaxExternalContexts = 4
-} TfLiteExternalContextType;
-
 // Forward declare so dependent structs and methods can reference these types
 // prior to the struct definitions.
 struct TfLiteContext;
 // struct TfLiteDelegate;
 struct TfLiteRegistration;
 // struct TfLiteOpaqueDelegateBuilder;
-
-/// An external context is a collection of information unrelated to the TF Lite
-/// framework, but useful to a subset of the ops. TF Lite knows very little
-/// about the actual contexts, but it keeps a list of them, and is able to
-/// refresh them if configurations like the number of recommended threads
-/// change.
-typedef struct TfLiteExternalContext {
-  TfLiteExternalContextType type;
-  TfLiteStatus (*Refresh)(struct TfLiteContext* context);
-} TfLiteExternalContext;
 
 #define kTfLiteOptionalTensor (-1)
 
@@ -472,12 +450,6 @@ typedef struct TfLiteContext {
   /// Number of threads that are recommended to subsystems like gemmlowp and
   /// eigen.
   int recommended_num_threads;
-
-  /// Access external contexts by type.
-  ///
-  /// WARNING: This is an experimental interface that is subject to change.
-  TfLiteExternalContext* (*GetExternalContext)(struct TfLiteContext*,
-                                               TfLiteExternalContextType);
 
   /// Pointer to the op-level profiler, if set; nullptr otherwise.
   void* profiler;

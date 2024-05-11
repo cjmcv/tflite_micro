@@ -129,11 +129,6 @@ inline TfLiteEvalTensor* MicroContextGetEvalTensor(
     const struct TfLiteContext* context, int tensor_idx) {
   return GetMicroContext(context)->GetEvalTensor(tensor_idx);
 }
-inline TfLiteExternalContext* MicroContextGetExternalContext(
-    TfLiteContext* context, TfLiteExternalContextType unused) {
-  return reinterpret_cast<TfLiteExternalContext*>(
-      GetMicroContext(context)->external_context());
-}
 
 // Requests that an error be reported with format string msg.
 void MicroContextReportOpError(struct TfLiteContext* context,

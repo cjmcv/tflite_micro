@@ -7,7 +7,7 @@
 *__pycache__*
 venv
 gen
-
+tensorflow/lite/micro/examples/unit_test/build
 # Ignore the directory in which `clangd` stores its local index.
 /.cache/
 

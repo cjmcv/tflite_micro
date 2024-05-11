@@ -27,6 +27,11 @@ limitations under the License.
 // #include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
+  
+// The default buffer alignment requirement.
+// We align tensor buffers to 16-byte boundaries, since this is a common
+// requirement for SIMD extensions.
+constexpr int MicroArenaBufferAlignment() { return 16; }
 
 // TODO(b/199402574): rename to tflite_internal or just remove internal
 // namespace.
