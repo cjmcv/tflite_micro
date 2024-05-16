@@ -7,7 +7,8 @@ CXX_TOOL := g++
 CC_TOOL  := gcc
 AR_TOOL  := ar
 CXXFLAGS := -Werror -fno-exceptions -fPIC -std=c++11
-LDFLAGS  := -lstdc++ -lm 
+LDFLAGS  := -lstdc++ -lm
+MARCOFLAGS := 
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
@@ -28,8 +29,15 @@ INCLUDE  := -I. \
 SRC      :=                      \
 	$(wildcard $(CURDIR)/main.cc)
 
-# SRC += 	$(wildcard $(CURDIR)/main.cc)
+#
+INCLUDE += -I/usr/include/python3.8/
+INCLUDE += -I/usr/local/lib/python3.8/dist-packages/numpy/core/include/
 
+LDFLAGS += -L/usr/lib/x86_64-linux-gnu/libpython3.8.a
+LDFLAGS += -lpython3.8
+
+MARCOFLAGS += -DNPY_NO_DEPRECATED_API
+#
 
 OBJECTS  := $(SRC:%.cc=$(OBJ_DIR)/%.o)
 DEPENDENCIES \
@@ -39,11 +47,11 @@ all: build $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: %.cc
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -MMD -o $@
+	$(CXX) $(CXXFLAGS) $(MARCOFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(MARCOFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
 -include $(DEPENDENCIES)
 
