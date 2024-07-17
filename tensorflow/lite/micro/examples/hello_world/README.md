@@ -1,5 +1,7 @@
 <!-- mdformat off(b/169948621#comment2) -->
 
+make -f tensorflow/lite/micro/tools/make/Makefile test_hello_world_test -j6
+
 # Hello World Example
 
 This example is designed to demonstrate the absolute basics of using [TensorFlow
